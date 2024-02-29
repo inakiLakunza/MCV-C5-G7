@@ -12,8 +12,10 @@ from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
+from detectron2.data.datasets import register_coco_instances
 
 import torch
+from pathlib import Path
 
 
 def save_img(img, output, save_path, cfg):
@@ -27,6 +29,7 @@ def save_img(img, output, save_path, cfg):
 def save_sequence_inferences(predictor, sequence_path, save_path):
     sequences = glob.glob(sequence_path+"/*")
     sequences.sort()
+    res = {}
 
     for sequence in sequences:
         seq = sequence.split("/")[-1]
@@ -54,3 +57,7 @@ def save_sequence_inferences(predictor, sequence_path, save_path):
         pkl_save_path_boxes = os.path.join(seq_path, "boxes.pkl")
         with open(pkl_save_path_boxes, 'wb') as file:
             pickle.dump(inference_boxes, file)
+
+
+def register_json(name, json_train, path_train):
+    register_coco_instances(name, {}, json_train, path_train)
