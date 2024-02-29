@@ -36,7 +36,7 @@ from pycocotools.mask import toBbox
 import torch
 
 from pathlib import Path
-
+import random 
 
 
 print(torch.cuda.device_count())
@@ -117,11 +117,20 @@ if __name__ == "__main__":
 
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(kitti_names)
 
+
+    #Uncomment if you want to train again the model
+    '''
     # TRAIN THE MODEL
     trainer = DefaultTrainer(cfg)
     trainer.resume_or_load(resume=False)
     trainer.train()
+    '''
 
+    # Inference should use the config with parameters that are used in training
+    # cfg now already contains everything we've set previously. We changed it a little bit for inference:
+    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_final.pth")  # path to the model we just trained
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
+    predictor = DefaultPredictor(cfg)
 
 
     # EVALUATE THE MODEL
@@ -130,11 +139,19 @@ if __name__ == "__main__":
                 output_dir=str(output_dir),
     )
 
-    predictor = DefaultPredictor(cfg)
     val_loader = build_detection_test_loader(cfg, FT_DATASET_NAME + "val")
 
 
     print(inference_on_dataset(predictor.model, val_loader, evaluator))
+
+    #save example
+    dataset_kitti = get_KITTI(PATH_PARENT_DIRECTORY ,'val')
+    
+    cont = 1
+    for d in random.sample(dataset_kitti, 3): 
+        im = cv2.imread(d["file_name"])
+        save_img(im, predictor(im), 'example_trained_'+str(cont)+'.png', cfg)
+        cont=+1
 
 
 
