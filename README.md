@@ -12,5 +12,5 @@ We had to compare our original implementation using PyTorch and this week's new 
 ## Week 2: Object Detection, Recognition and Segmentation
 We had to implement the Detectron2 pipeline to use Masked R-CNN and Faster R-CNN, for detection, recognition and segmentation (just Masked R-CNN) tasks.
 
-![summaryslide W2](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W2/summary_slide_G7_W2.jpg)
+![summaryslide W2](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W2/summary_slide_G7_W2.png)
 
