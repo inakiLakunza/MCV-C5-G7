@@ -69,9 +69,6 @@ cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model)
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
 
 
-
-# FASTER RCNN
-
 predictor = DefaultPredictor(cfg)
 
 
@@ -91,22 +88,22 @@ if __name__ == "__main__":
     register_json("DatasetKittyTest", annotations, path_test)
 
     coco_names = [""] * 81
-    coco_names[80] = "background"
+    #coco_names[80] = "background"
     coco_names[0] = "pedestrian"
     coco_names[2] = "car"    
-    coco_names[71] = "sink"
+    #coco_names[71] = "don't care"
 
 
     DATASET_NAME = "KITTI-MOTS-COCO_"
     for d in ['training', 'val']:
-        DatasetCatalog.register(DATASET_NAME + d, lambda d=d: from_KITTY_to_COCO(PATH_PARENT_DIRECTORY, d))
+        DatasetCatalog.register(DATASET_NAME + d, lambda d=d: from_KITTY_to_COCO_taskd(PATH_PARENT_DIRECTORY, d))
         MetadataCatalog.get(DATASET_NAME + d).set(
             thing_classes=coco_names, stuff_classes=coco_names
         )
     metadata = MetadataCatalog.get(DATASET_NAME + "val")
 
     print('Creating dataset')
-    dataset_dicts = from_KITTY_to_COCO(PATH_PARENT_DIRECTORY, 'val')
+    dataset_dicts = from_KITTY_to_COCO_taskd(PATH_PARENT_DIRECTORY, 'val')
     image_ids = [x["image_id"] for x in dataset_dicts]
 
     kitti_meta = MetadataCatalog.get(DATASET_NAME + "val")
@@ -114,10 +111,7 @@ if __name__ == "__main__":
     img = cv2.imread(dataset_dicts[0]["file_name"])
     visualizer = Visualizer(img[:, :, ::-1], metadata=kitti_meta, scale=0.5)
     out = visualizer.draw_dataset_dict(dataset_dicts[0])
-    plt.figure(dpi=150)
-    plt.axis("off")
-    plt.imshow(img)
-    plt.show()
+    
 
     cfg.merge_from_file(model_zoo.get_config_file(model))
 

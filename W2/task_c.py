@@ -47,16 +47,16 @@ cfg = get_cfg()
 # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
 
 # MASK RCNN
-cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
-SAVE_PATH_TRAIN_INFERENCES_KM = "/ghome/group07/C5-W2/task_c/mask/train_inferences_KM"
-SAVE_PATH_TEST_INFERENCES_KM = "/ghome/group07/C5-W2/task_c/mask/test_inferences_KM"
+#cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
+#cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
+#SAVE_PATH_TRAIN_INFERENCES_KM = "/ghome/group07/C5-W2/task_c/mask/train_inferences_KM"
+#SAVE_PATH_TEST_INFERENCES_KM = "/ghome/group07/C5-W2/task_c/mask/test_inferences_KM"
 
 # FASTER RCNN
-#cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_C4_1x.yaml"))
-#cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_C4_1x.yaml")
-#SAVE_PATH_TRAIN_INFERENCES_KM = "/ghome/group07/C5-W2/task_c/faster/train_inferences_KM"
-#SAVE_PATH_TEST_INFERENCES_KM = "/ghome/group07/C5-W2/task_c/faster/test_inferences_KM"
+cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_C4_1x.yaml"))
+cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_C4_1x.yaml")
+SAVE_PATH_TRAIN_INFERENCES_KM = "/ghome/group07/C5-W2/task_c/faster/train_inferences_KM"
+SAVE_PATH_TEST_INFERENCES_KM = "/ghome/group07/C5-W2/task_c/faster/test_inferences_KM"
 
 
 # SET THRESHOLD FOR SCORING
@@ -64,42 +64,26 @@ cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
 
 
 
-# FASTER RCNN
 
 predictor = DefaultPredictor(cfg)
 
 
-KITTY_MOTS_CLASSES = {
-    0: 'Car',
-    1: 'Van',
-    2: 'Truck',
-    3: 'Pedestrian',
-    4: 'Person_sitting',
-    5: 'Cyclist',
-    6: 'Tram',
-    7: 'Misc',
-    8: 'DontCare'
-}
-
-COCO_CLASSES = {}
-for i, name in enumerate(MetadataCatalog.get(cfg.DATASETS.TRAIN[0]).thing_classes):
-    COCO_CLASSES[i] = name
-
-
+'''
 # TASK a) and b) 
 #------------------------------------------------------------------------------------
-'''
-try_img_path = "/ghome/group07/mcv/datasets/C5/COCO/train2014/COCO_train2014_000000000009.jpg"
+
+#try_img_path = "/ghome/group07/mcv/datasets/C5/COCO/train2014/COCO_train2014_000000000009.jpg"
+try_img_path = '/ghome/group07/mcv/datasets/C5/KITTI-MOTS/training/image_02/0019/000002.png'
 try_img = cv2.imread(try_img_path)
 output = predictor(try_img)
 
 print(output["instances"].pred_classes)
 print(output["instances"].pred_boxes)
 
-save_img(try_img, output, "try_img.png", cfg)
-'''
-#------------------------------------------------------------------------------------
+save_img(try_img, output, "try3.png", cfg)
 
+#------------------------------------------------------------------------------------
+'''
 
 
 
