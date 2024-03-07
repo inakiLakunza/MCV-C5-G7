@@ -134,6 +134,8 @@ class ResNet_embedding(torch.nn.Module):
 
 
         return avg, mapk1, mapk5
+    
+    
 
 class SiameseNet(torch.nn.Module):    
     def __init__(self, embedding_net):        
