@@ -23,7 +23,7 @@ class Dataset():
                 self.labels.append(ctr)
                 self.captions.append(cat)
             ctr += 1
-        
+            
         self.transform = transforms.Compose([
             transforms.ToTensor(),
         ])
@@ -42,3 +42,17 @@ class Dataset():
         
 
 
+class WrapperDataloader(torch.utils.data.Dataset):
+    def __init__(self, inner_dataset):
+        self.inner_dataset = inner_dataset
+
+    def __getitem__(self, idx):
+        inputs, targets, _ = self.inner_dataset[idx]
+        return inputs, targets
+
+    def __iter__(self):
+        for item in self.inner_dataset:
+            yield item
+
+    def __len__(self):
+        return len(self.inner_dataset)

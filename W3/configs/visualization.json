@@ -1,0 +1,12 @@
+{
+
+    "TRAIN_PATH": "/ghome/group07/mcv/datasets/C3/MIT_split/train",
+    "TEST_PATH": "/ghome/group07/mcv/datasets/C3/MIT_split/test",
+
+    "TASK": "b",
+    "MODEL_NAME": "77fe8c85-83cd-4085-a827-94cab60b06e1",
+
+    "SAVE_FOLDER": "/ghome/group07/C5-W3/visualization_plots",
+    "ADDED_SAVE_NAME": "example"
+    
+}

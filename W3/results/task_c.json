@@ -1,0 +1,15 @@
+[
+    {},
+    {
+        "weights_name": "64824216-657e-46d6-9257-c1c1909c14a4",
+        "average_precision": 0.9107871618972772,
+        "mapk1": 0.8971499380421314,
+        "mapk5": 0.8964064436183391,
+        "fine_tune_time (s)": 125.74898195266724,
+        "BATCH_SIZE": 16,
+        "N_EPOCHS": 50,
+        "EMBED_SIZE": 2096,
+        "PREPROCESS": [],
+        "BASE_LR": 0.0001
+    }
+]

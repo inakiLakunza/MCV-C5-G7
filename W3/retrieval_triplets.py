@@ -1,9 +1,9 @@
 import torch
-import os
 import sys
 import numpy as np
 import json
 import uuid
+from time import time
 
 import torch.optim as optim
 from torch.utils.data import DataLoader, random_split
@@ -15,10 +15,16 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn import svm
 from sklearn.metrics import average_precision_score
 from model_classes import ResNet_embedding
-from pathlib import Path
+#from losses import ContrastiveLoss
+from torch.autograd import Variable
+from pytorch_metric_learning import losses
 
 from utils import transformstojson
 
+
+        
+
+        
 
 
 
@@ -40,19 +46,18 @@ if __name__ == '__main__':
     SAVE_RESULTS_PATH = config["SAVE_RESULTS_PATH"]
 
 
-
     print("Loading data.")
     MIT_split_train = Dataset(TRAIN_PATH)
     MIT_split_test = Dataset(TEST_PATH)
-    
-    # DEFINE WANTED PREPROCESSING TRANSFORMATIONS
+
+     # DEFINE WANTED PREPROCESSING TRANSFORMATIONS
     preproc_list = []
     # LATER FOR SAVING IN RESULTS:
     save_transforms = transformstojson(preproc_list)
 
     preprocess = transforms.Compose(preproc_list) 
-    #dataset = ImageFolder(TRAIN_PATH, transform =transforms.ToTensor())
-   
+    
+     
     # Split training into Train - Val
     total_size = len(MIT_split_train)
     val_size = int(total_size * float(VAL_RELATIVE_SIZE))
@@ -63,35 +68,43 @@ if __name__ == '__main__':
     val_dataloader = DataLoader(MIT_split_val, batch_size=BATCH_SIZE, shuffle=True)
 
     print("Looping through test dataloader...")
-    test_dataloader = DataLoader(MIT_split_test, batch_size=BATCH_SIZE, shuffle=True)
-    
+    test_dataloader = DataLoader(MIT_split_test, batch_size=16, shuffle=True)
     #for batch_idx, (images, labels, captions) in enumerate(test_dataloader):
     #    print(batch_idx, images.shape, labels, captions)
 
+    # TRIPLET, SO TRIPLET MARGIN LOSS
+    loss = losses.TripletMarginLoss()
+
     print("\nInitializing the Model...")
-    # CLASSIFICATION WITH RESNET, SO CROSS ENTROPY
-    loss=torch.nn.CrossEntropyLoss()
     model = ResNet_embedding(embed_size=EMBED_SIZE, batch_size=BATCH_SIZE, loss=loss, base_lr=BASE_LR)
+    
+    # TRAIN MODEL
+    start_time = time()
+    model.train_model_with_dataloader(train_dataloader)
+    fine_tune_time = time()-start_time
+
     clf, train_labels = model.train_knn(train_dataloader)
     avg_precision, mapk1, mapk5 = model.test(train_labels, test_dataloader, clf)
     print(f"\n\nObtained average precision: {avg_precision}")
     print(f"\nObtained mapk1: {mapk1} and mapk5: {mapk5}")
 
+
     # SAVE MODEL:
     unique_filename = str(uuid.uuid4())
-    SAVE_WEIGHTS_PATH = os.path.join(SAVE_WEIGHTS_PATH, "task_a", unique_filename+".pt")
+    SAVE_WEIGHTS_PATH = os.path.join(SAVE_WEIGHTS_PATH, "task_c", unique_filename+".pt")
     torch.save(model.state_dict(), SAVE_WEIGHTS_PATH)
     print(f"Model Saved Successfully as {unique_filename}")
 
     # SAVE RESULTS
     # ------------------------------------------------------------------------
-    SAVE_RESULTS_PATH = os.path.join(SAVE_RESULTS_PATH, "task_a.json")
+    SAVE_RESULTS_PATH = os.path.join(SAVE_RESULTS_PATH, "task_c.json")
     result = {
         
         "weights_name": unique_filename,
         "average_precision": avg_precision,
         "mapk1": mapk1,
         "mapk5": mapk5,
+        "fine_tune_time (s)": fine_tune_time,
         "BATCH_SIZE": BATCH_SIZE,
         "N_EPOCHS": NUM_OF_EPOCHS,
         "EMBED_SIZE": EMBED_SIZE,
@@ -113,19 +126,6 @@ if __name__ == '__main__':
         json.dump(data, outfile, indent = 4)
     # ------------------------------------------------------------------------
         
-    # LOAD AND TRY MODEL TO BE SURE
-    # IT WORKS OKAY!
-    #load_model = ResNet_embedding()
-    #load_model.load_state_dict(torch.load(SAVE_WEIGHTS_PATH))
-    #avg_precision, mapk1, mapk5 = model.test(train_labels, test_dataloader, clf)
-    #print(f"\n\nObtained average precision: {avg_precision}")
-    #print(f"\nObtained mapk1: {mapk1} and mapk5: {mapk5}")
-    
-
-
-
-
-
 
     
 

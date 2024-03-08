@@ -1,0 +1,12 @@
+Loading data.
+Looping through test dataloader...
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9107871618972772
+
+Obtained mapk1: 0.8971499380421314 and mapk5: 0.8964064436183391
+Model Saved Successfully as 64824216-657e-46d6-9257-c1c1909c14a4
