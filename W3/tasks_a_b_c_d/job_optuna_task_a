@@ -6,4 +6,4 @@
 #SBATCH -o %x_%u_%j.out # File to which STDOUT will be written
 #SBATCH -e %x_%u_%j.err # File to which STDERR will be written
 
-python3 retrieval_triplets.py
+python3 task_a_optuna.py

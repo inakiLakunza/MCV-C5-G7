@@ -1,0 +1,16 @@
+{
+
+    "BATCH_SIZE": 16,
+    "NUM_OF_EPOCHS": 50,
+    "BASE_LR": 1e-4,
+
+    "VAL_RELATIVE_SIZE": 0.3,
+    "EMBED_SIZE": 2096,
+
+    "TRAIN_PATH": "/ghome/group07/mcv/datasets/C3/MIT_split/train",
+    "TEST_PATH": "/ghome/group07/mcv/datasets/C3/MIT_split/test",
+
+    "SAVE_WEIGHTS_PATH": "/ghome/group07/C5-W3/saved_weights",
+    "SAVE_RESULTS_PATH": "/ghome/group07/C5-W3/results"
+    
+}

@@ -1,0 +1,10 @@
+{
+    "max_iter": 1500,
+    "lr": 0.0002,
+    "batch_size": 128,
+    "imgs_per_batch": 8,
+    "checkpoint_period": 500,
+
+    "TRAIN_PATH": "/ghome/group07/mcv/datasets/C3/MIT_split/train",
+    "TEST_PATH": "/ghome/group07/mcv/datasets/C3/MIT_split/test"
+}

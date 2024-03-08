@@ -1,0 +1,1301 @@
+Loading data.
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.7849337074646157
+
+Obtained mapk1: 0.7397769516728625 and mapk5: 0.6674101610904594
+Model Saved Successfully as 0fcf405b-8898-49f1-8b55-16804a82e60d
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.7444710234355777
+
+Obtained mapk1: 0.7038413878562577 and mapk5: 0.6446096654275106
+Model Saved Successfully as 6b7bedcc-700c-4ed6-95c1-4290f7f68621
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9010532446563895
+
+Obtained mapk1: 0.8748451053283767 and mapk5: 0.8054522924411396
+Model Saved Successfully as cadd4266-30b8-42ab-b1d8-13d8ee09abfb
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8582044357375522
+
+Obtained mapk1: 0.828996282527881 and mapk5: 0.7707558859975219
+Model Saved Successfully as 6e2ee6ad-24ef-41a9-8d2f-58fd41af5b1b
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.752006021405912
+
+Obtained mapk1: 0.6914498141263941 and mapk5: 0.6218091697645612
+Model Saved Successfully as ec967852-1595-4212-acd8-208cfb39c045
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.84268892507171
+
+Obtained mapk1: 0.8066914498141264 and mapk5: 0.759355638166049
+Model Saved Successfully as 07d328c0-308b-41ab-8a14-4908da501b2c
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9040501626872912
+
+Obtained mapk1: 0.8612143742255266 and mapk5: 0.8128872366790579
+Model Saved Successfully as 9deddf81-83e9-4a98-8df8-abe32eb7d04e
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8734433633544971
+
+Obtained mapk1: 0.8376703841387856 and mapk5: 0.7942998760842622
+Model Saved Successfully as cd78d5b3-b12c-4b32-a6ee-e74752c918e2
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9019953997977165
+
+Obtained mapk1: 0.8574969021065675 and mapk5: 0.8126394052044608
+Model Saved Successfully as ccf113be-3342-4e0f-be43-0c0b419752a1
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8973165016043885
+
+Obtained mapk1: 0.8426270136307311 and mapk5: 0.7903345724907066
+Model Saved Successfully as af626d80-7783-4d62-b674-6f8d5590e426
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8918915321979239
+
+Obtained mapk1: 0.8550185873605948 and mapk5: 0.8017348203221805
+Model Saved Successfully as 612132f7-04ca-4289-948f-d71c8957d1f6
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8997354250877393
+
+Obtained mapk1: 0.862453531598513 and mapk5: 0.8141263940520453
+Model Saved Successfully as 7b49df9e-4bf3-4971-91db-7a9cc8feec0d
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9031884114949656
+
+Obtained mapk1: 0.8760842627013631 and mapk5: 0.8118959107806698
+Model Saved Successfully as b2d33516-630b-4ba3-aec5-0eed2436e3e5
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9078423811721731
+
+Obtained mapk1: 0.8798017348203222 and mapk5: 0.8024783147459725
+Model Saved Successfully as 66b310b1-f67a-4fbc-8d2f-00f3b692e896
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.868658565678383
+
+Obtained mapk1: 0.8401486988847584 and mapk5: 0.7898389095415125
+Model Saved Successfully as 25713c23-95e0-42b4-b1c6-0d10132bbc4d
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9007750131044574
+
+Obtained mapk1: 0.8636926889714994 and mapk5: 0.8071871127633209
+Model Saved Successfully as cda3f4c3-45b2-4b91-b6ee-36586f5ec801
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9026795701183599
+
+Obtained mapk1: 0.8649318463444857 and mapk5: 0.8071871127633201
+Model Saved Successfully as d0f6a50f-87c8-4c5a-9706-5b95250da48e
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9148880977249556
+
+Obtained mapk1: 0.8773234200743495 and mapk5: 0.8084262701363069
+Model Saved Successfully as ec08116e-06dd-438a-99da-a7ba0a07a28c
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8987054472475418
+
+Obtained mapk1: 0.8649318463444857 and mapk5: 0.8138785625774474
+Model Saved Successfully as 5ea9358d-2912-407b-b3e1-f26736789745
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.904157497330776
+
+Obtained mapk1: 0.8661710037174721 and mapk5: 0.8047087980173482
+Model Saved Successfully as c420d5a4-5507-41e0-819e-fcaf129e06c5
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9120677614584372
+
+Obtained mapk1: 0.8711276332094176 and mapk5: 0.805452292441141
+Model Saved Successfully as d693038e-ba3a-4f07-8220-e68ccac57977
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8923771674911551
+
+Obtained mapk1: 0.8599752168525403 and mapk5: 0.7995043370508054
+Model Saved Successfully as e9d0f597-f0ba-4ff3-b1a3-0e782e5a6095
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8987072381062295
+
+Obtained mapk1: 0.872366790582404 and mapk5: 0.8126394052044614
+Model Saved Successfully as 5fb17d43-29d8-40c0-83a6-f9035ddb4241
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9114926637354315
+
+Obtained mapk1: 0.8686493184634448 and mapk5: 0.8161090458488219
+Model Saved Successfully as 56075cc0-3d28-49be-ab78-d9a4bd0c498f
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9046086940924786
+
+Obtained mapk1: 0.8674101610904585 and mapk5: 0.8054522924411396
+Model Saved Successfully as 7ca446a2-f3d0-4dbe-b910-4b389df3f311
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9103984763673205
+
+Obtained mapk1: 0.8736059479553904 and mapk5: 0.809169764560098
+Model Saved Successfully as b26baf2a-dbb2-46d0-9358-e2af2314dc57
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8897449036230658
+
+Obtained mapk1: 0.8463444857496902 and mapk5: 0.78736059479554
+Model Saved Successfully as a33e7abf-bf5c-4e8f-849d-cfcfdafdce9e
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9105056147325534
+
+Obtained mapk1: 0.8736059479553904 and mapk5: 0.8084262701363062
+Model Saved Successfully as 5895f610-5053-45cd-8b03-b0e6e6db66e5
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.83822710545063
+
+Obtained mapk1: 0.7905824039653035 and mapk5: 0.7278810408921941
+Model Saved Successfully as 9e1b8794-5f0d-45c8-8cb9-e367db6bfecd
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8638777416458321
+
+Obtained mapk1: 0.8252788104089219 and mapk5: 0.7690210656753403
+Model Saved Successfully as da73ebb6-1ef4-4f32-85ea-32ef829ebfc6
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8232346253030342
+
+Obtained mapk1: 0.8029739776951673 and mapk5: 0.7390334572490713
+Model Saved Successfully as 299db5c0-5c38-4762-b871-dd691fc77882
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9022941613310389
+
+Obtained mapk1: 0.8674101610904585 and mapk5: 0.8091697645600996
+Model Saved Successfully as 2f1a2bc7-bdf9-4e0f-96f4-7381cd2d135e
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9149534289327288
+
+Obtained mapk1: 0.8711276332094176 and mapk5: 0.8128872366790587
+Model Saved Successfully as 5fb28443-92e7-496d-b96f-9404765b7477
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8325074001589854
+
+Obtained mapk1: 0.7856257744733581 and mapk5: 0.7140024783147474
+Model Saved Successfully as 4ecb33a2-9c36-4716-ad12-b93a6689e55b
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8315631129317188
+
+Obtained mapk1: 0.8017348203221809 and mapk5: 0.724907063197027
+Model Saved Successfully as 436b16dd-1267-4e6a-83a5-7374834999f7
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9051607497816774
+
+Obtained mapk1: 0.8698884758364313 and mapk5: 0.8114002478314748
+Model Saved Successfully as b7c2c39c-59da-4061-ab99-090044133feb
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8622407544646236
+
+Obtained mapk1: 0.8079306071871127 and mapk5: 0.724411400247832
+Model Saved Successfully as 12cd8109-c1bd-4de2-96ac-2248a954b80f
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8824345884129957
+
+Obtained mapk1: 0.8451053283767038 and mapk5: 0.7764560099132595
+Model Saved Successfully as 63d823d1-6b96-48d9-bde0-47332495ba6d
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.851955031149066
+
+Obtained mapk1: 0.8277571251548946 and mapk5: 0.7410161090458498
+Model Saved Successfully as eddb50ae-4e4c-4059-9182-e9673b4a7508
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9180370857313762
+
+Obtained mapk1: 0.8748451053283767 and mapk5: 0.808674101610904
+Model Saved Successfully as 71f71400-2b05-494c-81bb-e0a8f292120f
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8051243518479072
+
+Obtained mapk1: 0.7670384138785625 and mapk5: 0.7026022304832721
+Model Saved Successfully as c635e97b-97ae-4f0a-9278-35ad19c8ad93
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.910069722300158
+
+Obtained mapk1: 0.8711276332094176 and mapk5: 0.808178438661709
+Model Saved Successfully as 51f40214-d486-4f7d-a58f-5870a3e7da06
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9154805457305859
+
+Obtained mapk1: 0.8785625774473358 and mapk5: 0.8064436183395288
+Model Saved Successfully as 74eb9195-10c9-42ca-886a-0e68259adf90
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9097767802978163
+
+Obtained mapk1: 0.8736059479553904 and mapk5: 0.8029739776951674
+Model Saved Successfully as 631f7693-e5f0-4584-8573-631993e565ed
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8979065001864496
+
+Obtained mapk1: 0.8674101610904585 and mapk5: 0.808426270136307
+Model Saved Successfully as 366a0399-1b38-4e49-bb28-27b4e3d24221
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.833548706161328
+
+Obtained mapk1: 0.8228004956629492 and mapk5: 0.7596034696406438
+Model Saved Successfully as a5d4dc05-cc2d-4826-802e-8fd9cd7aed45
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8896019820057921
+
+Obtained mapk1: 0.8574969021065675 and mapk5: 0.8039653035935568
+Model Saved Successfully as 6f8f719f-9a57-44e5-8a87-937c0f01e177
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9224617984836134
+
+Obtained mapk1: 0.8798017348203222 and mapk5: 0.8019826517967784
+Model Saved Successfully as 4d930279-dcd9-4409-98ff-b7770bcc7f29
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9092204700219176
+
+Obtained mapk1: 0.8785625774473358 and mapk5: 0.8074349442379178
+Model Saved Successfully as 2957c900-3362-459b-b1fd-aec50914e846
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8729642531095727
+
+Obtained mapk1: 0.8376703841387856 and mapk5: 0.7858736059479554
+Model Saved Successfully as 83cc35b6-d240-4fe2-a4aa-aaa3278ba96f
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9125825710675048
+
+Obtained mapk1: 0.8698884758364313 and mapk5: 0.810656753407683
+Model Saved Successfully as 89b97b60-a9a9-4594-b033-93645179bba3
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9021402502280553
+
+Obtained mapk1: 0.8574969021065675 and mapk5: 0.8047087980173486
+Model Saved Successfully as 500b6c25-3976-417d-aaa4-6578e7ce2f8f
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8911931221768965
+
+Obtained mapk1: 0.8599752168525403 and mapk5: 0.8081784386617098
+Model Saved Successfully as fb6ca1fd-8aa4-4373-b44f-14cafba3dc88
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8969636182656635
+
+Obtained mapk1: 0.8636926889714994 and mapk5: 0.7990086741016114
+Model Saved Successfully as b4fcb4e4-e645-4eeb-84b6-15a201d2df06
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8943551345820776
+
+Obtained mapk1: 0.8500619578686494 and mapk5: 0.7985130111524164
+Model Saved Successfully as f0809841-dddd-4a73-bf49-29db0a3fbea7
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9078053074436123
+
+Obtained mapk1: 0.8711276332094176 and mapk5: 0.8037174721189597
+Model Saved Successfully as 9ea97f96-e4d3-4ba8-99e0-5c7b64183c50
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8897880814750889
+
+Obtained mapk1: 0.8574969021065675 and mapk5: 0.8116480793060717
+Model Saved Successfully as 3f7ae038-1771-40ee-af2d-c0605570e7ad
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8315014438293964
+
+Obtained mapk1: 0.8004956629491945 and mapk5: 0.7412639405204469
+Model Saved Successfully as 8db66330-1194-42ce-91ef-bc33dc83553b
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.905438928266225
+
+Obtained mapk1: 0.8711276332094176 and mapk5: 0.8086741016109041
+Model Saved Successfully as 92be2f8b-3db5-4035-992a-c48abde50ff7
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8634993990542822
+
+Obtained mapk1: 0.8302354399008675 and mapk5: 0.7700123915737304
+Model Saved Successfully as 67f26d36-ba65-4cbc-9e91-3b1a7f38b7cd
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9010186504760529
+
+Obtained mapk1: 0.8736059479553904 and mapk5: 0.8143742255266424
+Model Saved Successfully as d5e7c05f-ff65-49b7-971b-41282ef0c08e
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8950837364478734
+
+Obtained mapk1: 0.8674101610904585 and mapk5: 0.8136307311028503
+Model Saved Successfully as 0745e3c6-1b03-4b63-8d8c-cc986435ed83
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8956726446765042
+
+Obtained mapk1: 0.862453531598513 and mapk5: 0.8101610904584877
+Model Saved Successfully as a801145c-16c6-4b39-ad7e-85ab0fb80b2d
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9193930043568612
+
+Obtained mapk1: 0.8872366790582404 and mapk5: 0.815613382899628
+Model Saved Successfully as 28cf9952-dde1-40fb-a560-978861e7032a
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9048839299025047
+
+Obtained mapk1: 0.8686493184634448 and mapk5: 0.8061957868649322
+Model Saved Successfully as 93cc11b1-e989-460e-b1ab-1ec9dfcf64c5
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8987556335484006
+
+Obtained mapk1: 0.8674101610904585 and mapk5: 0.810656753407683
+Model Saved Successfully as a52c9d14-d76a-4629-87d6-153c89583eb1
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9135841841748331
+
+Obtained mapk1: 0.8686493184634448 and mapk5: 0.807434944237918
+Model Saved Successfully as 54d3ba6c-efe0-4f81-8b8c-c83a09add5a7
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8374192541792267
+
+Obtained mapk1: 0.7905824039653035 and mapk5: 0.7241635687732344
+Model Saved Successfully as 809574f5-aadb-469d-8d14-3adf87309b91
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8979194557799818
+
+Obtained mapk1: 0.8562577447335812 and mapk5: 0.782651796778191
+Model Saved Successfully as a17be18b-beba-455b-a87f-22dc9b888bd5
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9071707453783595
+
+Obtained mapk1: 0.8798017348203222 and mapk5: 0.808674101610905
+Model Saved Successfully as f771571b-a486-4587-9061-05d8393ed99c
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9102874125671607
+
+Obtained mapk1: 0.8649318463444857 and mapk5: 0.8079306071871126
+Model Saved Successfully as 1de46c23-50da-4bb3-8712-9d74eb78f43d
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9079228102735957
+
+Obtained mapk1: 0.8636926889714994 and mapk5: 0.8116480793060719
+Model Saved Successfully as b73a23da-4400-4f71-a345-a32e12860dd0
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9044245749705057
+
+Obtained mapk1: 0.8649318463444857 and mapk5: 0.8017348203221816
+Model Saved Successfully as 5702564e-6ee1-489e-9fcf-32730dc0ca4f
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8779099174990173
+
+Obtained mapk1: 0.8451053283767038 and mapk5: 0.806691449814127
+Model Saved Successfully as f68c8018-8876-47b3-9f86-6ff28f46aafe
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9086575439828211
+
+Obtained mapk1: 0.8748451053283767 and mapk5: 0.812143742255266
+Model Saved Successfully as 39538190-ce62-4503-9223-0b6f8afe7d90
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9131640487383557
+
+Obtained mapk1: 0.8661710037174721 and mapk5: 0.8111524163568775
+Model Saved Successfully as 41d47aa6-b34e-4338-8bdb-f911f0d78c14
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8182278764078654
+
+Obtained mapk1: 0.7781908302354399 and mapk5: 0.727881040892194
+Model Saved Successfully as 028dcb86-3f78-4cce-b624-f49016edd4d5
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9112215572284954
+
+Obtained mapk1: 0.8711276332094176 and mapk5: 0.8074349442379175
+Model Saved Successfully as 85466f88-a98d-4e87-bec7-2d74fbc8bc0e
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9145514794797884
+
+Obtained mapk1: 0.8847583643122676 and mapk5: 0.7982651796778186
+Model Saved Successfully as 38162409-f25c-4a79-8a8c-71380f97128b
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8560004899276723
+
+Obtained mapk1: 0.8203221809169765 and mapk5: 0.7645600991325898
+Model Saved Successfully as fa08580a-86bd-41ca-8ca0-9e711c393cc2
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8165678238373089
+
+Obtained mapk1: 0.7905824039653035 and mapk5: 0.7125154894671629
+Model Saved Successfully as 7e5af63b-8f96-4bef-ae40-34bf45509bdf
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9018940237398265
+
+Obtained mapk1: 0.8599752168525403 and mapk5: 0.8123915737298633
+Model Saved Successfully as 38156da9-6655-45ed-a242-18058e193cc2
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9133264249475173
+
+Obtained mapk1: 0.8736059479553904 and mapk5: 0.8106567534076822
+Model Saved Successfully as 46cfcfc0-4421-4f88-aa63-5aa055e6398d
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8973646553518134
+
+Obtained mapk1: 0.8599752168525403 and mapk5: 0.7997521685254025
+Model Saved Successfully as a90da35c-3fbe-4a0a-9213-6fa04c42730b
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9150015974385788
+
+Obtained mapk1: 0.8798017348203222 and mapk5: 0.8141263940520446
+Model Saved Successfully as fde7dc7d-15ed-468e-867f-f81cd29b1cd7
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8960225021396349
+
+Obtained mapk1: 0.8525402726146221 and mapk5: 0.8039653035935563
+Model Saved Successfully as ba38e74d-21b6-439f-96ca-3bdfe375260e
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9119829696451202
+
+Obtained mapk1: 0.8773234200743495 and mapk5: 0.7962825278810418
+Model Saved Successfully as 0d911376-ab7e-48a2-815f-745e9229b71b
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8873719857141925
+
+Obtained mapk1: 0.8376703841387856 and mapk5: 0.7851301115241628
+Model Saved Successfully as a6e4f73b-f569-4297-8360-4a905a41a62e
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.912512465948444
+
+Obtained mapk1: 0.8785625774473358 and mapk5: 0.8042131350681552
+Model Saved Successfully as 1fad9e5a-09d4-451c-8e93-f1c2de2a618f
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9115933438661735
+
+Obtained mapk1: 0.872366790582404 and mapk5: 0.8089219330855018
+Model Saved Successfully as 4a5363a2-7a94-4c55-bd36-004669b29402
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9079781569463213
+
+Obtained mapk1: 0.8537794299876085 and mapk5: 0.8084262701363065
+Model Saved Successfully as 189a908b-f431-4621-9ec7-4f72a3f8254a
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9161547817335428
+
+Obtained mapk1: 0.8711276332094176 and mapk5: 0.8166047087980168
+Model Saved Successfully as 5cefed6e-20c5-4751-a818-34718cef3efb
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9059510515309271
+
+Obtained mapk1: 0.872366790582404 and mapk5: 0.808921933085501
+Model Saved Successfully as 1e72f744-d1e2-444e-a492-d5a7654130b3
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9121083376738927
+
+Obtained mapk1: 0.8686493184634448 and mapk5: 0.8109045848822799
+Model Saved Successfully as 337943f9-b381-4e4d-a6ca-3506f636a90c
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8991949477571712
+
+Obtained mapk1: 0.8711276332094176 and mapk5: 0.8002478314745977
+Model Saved Successfully as 372bfb3f-2076-47e8-be54-d91ecf1ed512
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8957367026880626
+
+Obtained mapk1: 0.8550185873605948 and mapk5: 0.8037174721189582
+Model Saved Successfully as 9f52e432-87bd-4629-a2fa-104b46aca5b1
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8021972824537844
+
+Obtained mapk1: 0.7620817843866171 and mapk5: 0.7199504337050813
+Model Saved Successfully as 71d7c94a-6446-47ee-a8ad-061f14107160
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.8970382608517113
+
+Obtained mapk1: 0.8562577447335812 and mapk5: 0.8136307311028496
+Model Saved Successfully as aef799fb-4710-4c6a-a32b-0c0d050a411f
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9084098276780168
+
+Obtained mapk1: 0.8649318463444857 and mapk5: 0.8084262701363075
+Model Saved Successfully as 5e3a01fe-731f-4f67-83da-d45ce658b7b7
+Looping through test dataloader...
+
+
+
+Initializing the Model...
+Initializing Model with cuda
+
+
+
+Obtained average precision: 0.9032681880529125
+
+Obtained mapk1: 0.8649318463444857 and mapk5: 0.8019826517967783
+Model Saved Successfully as 3d13eac1-581a-47fd-bc80-9776c39fe5e4
