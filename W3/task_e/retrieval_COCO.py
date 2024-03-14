@@ -18,19 +18,37 @@ import pickle as pkl
 import utils
 import random
 import matplotlib.pyplot as plt
-
-
 from pycocotools import mask
-
-
-
 import cv2
+import tqdm
+import pickle
+from torchvision.models.detection import fasterrcnn_resnet50_fpn
+import tqdm
+
+
+# MODEL ====================================================================
+
+class EmbeddingLayer(torch.nn.Module):
+    def __init__(self, embed_size):
+        super(EmbeddingLayer, self).__init__()
+        self.linear = torch.nn.Linear(4096, embed_size)
+        self.activation = torch.nn.ReLU()
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    def forward(self, x):
+        #print(f'Lo que le llega en nuestro embedding {x["pool"].shape} {x["0"].shape} {x["1"].shape} {x["2"].shape}')
+
+        x = x["pool"].flatten()
+        x = self.activation(x)
+        x = self.linear(x)
+        return x
 
 
 if __name__ == '__main__':
-
     f = open('./configs/task_e_train_config.json')
     config = json.load(f)
+    generate_data_dicts = False
+    generate_dataloader = False
 
     PATH_PARENT_DIRECTORY = "/ghome/group07/mcv/datasets/C5/COCO"
     PATH_TRAINING_SET = os.path.join(PATH_PARENT_DIRECTORY, "train2014")
@@ -40,29 +58,102 @@ if __name__ == '__main__':
     RETRIEVAL_ANNOTATIONS = "/ghome/group07/mcv/datasets/C5/COCO/mcv_image_retrieval_annotations.json"
     FT_DATASET_NAME = "coco"
 
-    f = open(RETRIEVAL_ANNOTATIONS)
-    object_annotations = json.load(f)
-    os.makedirs('./data/custom_ids', exist_ok=True)
-    os.makedirs('./data/custom_labels', exist_ok=True)
-
     path_ids_train = './data/custom_ids/train.pkl'
     path_labels_train = './data/custom_labels/train.pkl'
-    utils.save_custom_data(object_annotations["train"], path_ids_train, path_labels_train)
-
     path_ids_test = './data/custom_ids/test.pkl'
     path_labels_test = './data/custom_labels/test.pkl'
-    utils.save_custom_data(object_annotations["test"], path_ids_test, path_labels_test)
+
+    # Model
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    totensor = transforms.Compose([transforms.Resize((224, 224)), transforms.PILToTensor()])
+    triplet_loss = torch.nn.TripletMarginLoss(margin=0.5, p=2, eps=1e-7)
+    model = fasterrcnn_resnet50_fpn(weights='COCO_V1').backbone
+    embed = EmbeddingLayer(embed_size=2048)
+    model = torch.nn.Sequential(*list(model.children())[:], embed)
+    model.to(device)
+
+    optimizer = optim.Adam(model.parameters(), lr=2e-5)
+
+    # Antes
+    #model = models.resnet18(weights=True)
+    # model = torch.nn.Sequential(*list(model.children())[:-1], embed)
+
+    f = open(RETRIEVAL_ANNOTATIONS)
+    object_annotations = json.load(f)
+
+    # Generate data dicts if true...
+    if generate_data_dicts:
+        os.makedirs('./data/custom_ids', exist_ok=True)
+        os.makedirs('./data/custom_labels', exist_ok=True)
+        utils.save_custom_data(object_annotations["train"], path_ids_train, path_labels_train)
+        utils.save_custom_data(object_annotations["test"], path_ids_test, path_labels_test)
 
     with open(path_ids_train, "rb") as f:
-        # Save the data to the file
         ids_train = pkl.load(f)
 
     with open(path_labels_train, "rb") as f:
-        # Save the data to the file
         labels_train = pkl.load(f)
+    
+    
+    # Generate train dict (anchor,  positive,  negative,  anchor labels)
+    if generate_dataloader:
+        os.makedirs('./data/dataloader', exist_ok=True)
+        dataloader_train = utils.create_image_loader(labels_train)
+        with open('./data/dataloader/train_1_1.pkl', "wb") as f:
+            pkl.dump(dataloader_train, f)
+    
+    with open('./data/dataloader/train_1_1.pkl', "rb") as f:
+        dataloader_train = pkl.load(f)
 
-    print(labels_train)
-    print(ids_train)
+
+    # TODO: continue here with the training loop from iñaki notebook
+    model.train()
+    num_epochs = 3
+    for epoch in range(num_epochs):
+        running_loss = []
+        for anchor, positive, negative, anchor_labels in tqdm.tqdm(dataloader_train):
+            # print(f'anchor: {anchor}')
+            # print(f'positive: {positive}')
+            # print(f'negative: {negative}')
+            # print(f'anchor_labels: {anchor_labels}')
+
+            optimizer.zero_grad()
+
+            # Read Images
+            anchor_path = os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(anchor).zfill(12) + '.jpg')
+            pos_path = os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(positive).zfill(12) + '.jpg')
+            neg_path = os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(negative).zfill(12) + '.jpg')
+            anchor_img = totensor(Image.open(anchor_path).convert('RGB')).to(device)
+            pos_img = totensor(Image.open(pos_path).convert('RGB')).to(device)
+            neg_img = totensor(Image.open(neg_path).convert('RGB')).to(device)
+
+            # Embeddings
+            anchor_img = anchor_img.float().unsqueeze(0)
+            pos_img = pos_img.float().unsqueeze(0)
+            neg_img = neg_img.float().unsqueeze(0) 
+            anchor_out = model(anchor_img)
+            pos_out = model(pos_img)
+            neg_out = model(neg_img)
+
+            # Compute Triplet Loss
+            loss = triplet_loss(anchor_out, pos_out, neg_out)
+            # print(loss)
+            loss.backward()
+            optimizer.step()
+            running_loss.append(loss)
+        
+        print(f'EPOCH {epoch} Avg Triplet Loss: {sum(running_loss) / len(running_loss)}')
+            
+    
+    SAVE_PATH = "/ghome/group07/C5-W3/task_e/saved_models/model_emb2048_margin05_p2_epochs2.pth"
+    torch.save(model.state_dict(), SAVE_PATH)
+
+
+
+
+
+
+
 
 
     sys.exit()

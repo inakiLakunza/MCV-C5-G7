@@ -74,6 +74,7 @@ if __name__ == '__main__':
         knn_metric = trial.suggest_categorical("knn_metric", KNN_METRICS)
         n_neighbors = trial.suggest_int("n_neighbors", 5, 50)
         batch_size = trial.suggest_categorical("batch_size", [8, 16, 32, 64, 128])
+        embed_size = trial.suggest_categorical("embed_size", [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 2096])
 
         train_dataloader = DataLoader(MIT_split_train, batch_size=batch_size, shuffle=True)
         val_dataloader = DataLoader(MIT_split_val, batch_size=batch_size, shuffle=True)
@@ -92,12 +93,13 @@ if __name__ == '__main__':
         print(f"\n\nObtained average precision: {avg_precision}")
         print(f"\nObtained mapk1: {mapk1} and mapk5: {mapk5}")
 
-        # SAVE MODEL:
-        SAVE_WEIGHTS_PATH = config["SAVE_WEIGHTS_PATH"]
+
+        ## SAVE MODEL:
+        #SAVE_WEIGHTS_PATH = config["SAVE_WEIGHTS_PATH"]
         unique_filename = str(uuid.uuid4())
-        SAVE_WEIGHTS_PATH = os.path.join(SAVE_WEIGHTS_PATH, "task_a", unique_filename+".pt")
-        torch.save(model.state_dict(), SAVE_WEIGHTS_PATH)
-        print(f"Model Saved Successfully as {unique_filename}")
+        #SAVE_WEIGHTS_PATH = os.path.join(SAVE_WEIGHTS_PATH, "task_a", unique_filename+".pt")
+        #torch.save(model.state_dict(), SAVE_WEIGHTS_PATH)
+        #print(f"Model Saved Successfully as {unique_filename}")
 
         # SAVE RESULTS
         # ------------------------------------------------------------------------
@@ -109,6 +111,8 @@ if __name__ == '__main__':
             "average_precision": avg_precision,
             "mapk1": mapk1,
             "mapk5": mapk5,
+            "sum_mapk1_mapk5": mapk1+mapk5,
+            "embed_size": embed_size,
             "KNN_metric": knn_metric,
             "KNN_n_neighbors": n_neighbors,
             "KNN_fit_time": knn_time,
@@ -137,7 +141,7 @@ if __name__ == '__main__':
     
 
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=100)
+    study.optimize(objective, n_trials=300)
 
 
 
