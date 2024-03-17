@@ -24,7 +24,8 @@ import tqdm
 import pickle
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 import tqdm
-
+from visualization import display_tsne_plot
+from sklearn.metrics import accuracy_score
 
 # MODEL ====================================================================
 
@@ -37,11 +38,41 @@ class EmbeddingLayer(torch.nn.Module):
 
     def forward(self, x):
         #print(f'Lo que le llega en nuestro embedding {x["pool"].shape} {x["0"].shape} {x["1"].shape} {x["2"].shape}')
-
-        x = x["pool"].flatten()
+        x = x["pool"].flatten(start_dim=1)
         x = self.activation(x)
         x = self.linear(x)
         return x
+    
+class ImageDataset(Dataset):
+    def __init__(self, train_dict, transform=None):
+        arr = np.empty((len(train_dict), 4), dtype=object)
+        arr[:] = train_dict
+
+        self.anchors = arr[:, 0]
+        self.positives = arr[:, 1]
+        self.negatives = arr[:, 2]
+
+        self.transform = transforms.Compose(
+            [
+                transforms.Resize((224, 224)), 
+                transforms.PILToTensor(),
+                # add more if needed
+            ]
+        )
+
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    def __len__(self):
+        return self.anchors.shape[0]
+
+    def __getitem__(self, idx):
+        anchor_path = os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(self.anchors[idx]).zfill(12) + '.jpg')
+        pos_path = os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(self.positives[idx]).zfill(12) + '.jpg')
+        neg_path = os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(self.negatives[idx]).zfill(12) + '.jpg')
+        anchor_img = self.transform(Image.open(anchor_path).convert('RGB')).to(device)
+        pos_img = self.transform(Image.open(pos_path).convert('RGB')).to(device)
+        neg_img = self.transform(Image.open(neg_path).convert('RGB')).to(device)
+        return anchor_img, pos_img, neg_img
 
 
 if __name__ == '__main__':
@@ -49,6 +80,7 @@ if __name__ == '__main__':
     config = json.load(f)
     generate_data_dicts = False
     generate_dataloader = False
+    train_model = False
 
     PATH_PARENT_DIRECTORY = "/ghome/group07/mcv/datasets/C5/COCO"
     PATH_TRAINING_SET = os.path.join(PATH_PARENT_DIRECTORY, "train2014")
@@ -65,7 +97,6 @@ if __name__ == '__main__':
 
     # Model
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    totensor = transforms.Compose([transforms.Resize((224, 224)), transforms.PILToTensor()])
     triplet_loss = torch.nn.TripletMarginLoss(margin=0.5, p=2, eps=1e-7)
     model = fasterrcnn_resnet50_fpn(weights='COCO_V1').backbone
     embed = EmbeddingLayer(embed_size=2048)
@@ -90,9 +121,13 @@ if __name__ == '__main__':
 
     with open(path_ids_train, "rb") as f:
         ids_train = pkl.load(f)
+    with open(path_ids_test, "rb") as f:
+        ids_test = pkl.load(f)
 
     with open(path_labels_train, "rb") as f:
         labels_train = pkl.load(f)
+    with open(path_labels_test, "rb") as f:
+        labels_test = pkl.load(f)
     
     
     # Generate train dict (anchor,  positive,  negative,  anchor labels)
@@ -104,136 +139,96 @@ if __name__ == '__main__':
     
     with open('./data/dataloader/train_1_1.pkl', "rb") as f:
         dataloader_train = pkl.load(f)
+        dataloader_train = ImageDataset(dataloader_train)
+        dataloader_train = DataLoader(dataloader_train, batch_size=64, drop_last=True, shuffle=True)
 
+    
+    # Train
+    if train_model:
+        model.train()
+        num_epochs = 10
+        for epoch in range(num_epochs):
+            running_loss = []
+            for batch_idx, (anchor_img, pos_img, neg_img)in enumerate(tqdm.tqdm(dataloader_train)):
+                # print(f'anchor: {anchor}')
+                # print(f'positive: {positive}')
+                # print(f'negative: {negative}')
+                # print(f'anchor_labels: {anchor_labels}')
+                optimizer.zero_grad()
 
-    # TODO: continue here with the training loop from iñaki notebook
-    model.train()
-    num_epochs = 3
-    for epoch in range(num_epochs):
-        running_loss = []
-        for anchor, positive, negative, anchor_labels in tqdm.tqdm(dataloader_train):
-            # print(f'anchor: {anchor}')
-            # print(f'positive: {positive}')
-            # print(f'negative: {negative}')
-            # print(f'anchor_labels: {anchor_labels}')
+                # Embeddings
+                anchor_img = anchor_img.float()
+                pos_img = pos_img.float()
+                neg_img = neg_img.float()
+                anchor_out = model(anchor_img)
+                pos_out = model(pos_img)
+                neg_out = model(neg_img)
 
-            optimizer.zero_grad()
-
-            # Read Images
-            anchor_path = os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(anchor).zfill(12) + '.jpg')
-            pos_path = os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(positive).zfill(12) + '.jpg')
-            neg_path = os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(negative).zfill(12) + '.jpg')
-            anchor_img = totensor(Image.open(anchor_path).convert('RGB')).to(device)
-            pos_img = totensor(Image.open(pos_path).convert('RGB')).to(device)
-            neg_img = totensor(Image.open(neg_path).convert('RGB')).to(device)
-
-            # Embeddings
-            anchor_img = anchor_img.float().unsqueeze(0)
-            pos_img = pos_img.float().unsqueeze(0)
-            neg_img = neg_img.float().unsqueeze(0) 
-            anchor_out = model(anchor_img)
-            pos_out = model(pos_img)
-            neg_out = model(neg_img)
-
-            # Compute Triplet Loss
-            loss = triplet_loss(anchor_out, pos_out, neg_out)
-            # print(loss)
-            loss.backward()
-            optimizer.step()
-            running_loss.append(loss)
-        
-        print(f'EPOCH {epoch} Avg Triplet Loss: {sum(running_loss) / len(running_loss)}')
+                # Compute Triplet Loss
+                loss = triplet_loss(anchor_out, pos_out, neg_out)
+                loss.backward()
+                optimizer.step()
+                running_loss.append(loss.item())
             
+            # Hay que hacer esto con tensor (torch().mean())
+            print(f'EPOCH {epoch} Avg Triplet Loss: {torch.Tensor(running_loss).mean()}')
+                
+        
+        SAVE_PATH = "/ghome/group07/C5-W3/task_e/saved_models/model_emb2048_margin05_p2_epochs10.pth"
+        torch.save(model.state_dict(), SAVE_PATH)
     
-    SAVE_PATH = "/ghome/group07/C5-W3/task_e/saved_models/model_emb2048_margin05_p2_epochs2.pth"
-    torch.save(model.state_dict(), SAVE_PATH)
+    
+    # Validate (and t-SNE plot) ===========================================================
+    transform = transforms.Compose(
+            [
+                transforms.Resize((224, 224)), 
+                transforms.PILToTensor(),
+                # add more if needed
+            ]
+        )
+    model.load_state_dict(torch.load('/ghome/group07/C5-W3/task_e/saved_models/model_emb2048_margin05_p2_epochs2.pth'))
+    model.eval()
+    pred_embds = []
+    true_labels = []
+    for img_id, labels in tqdm.tqdm(labels_test.items()):
+        # Read image
+        anchor_path = os.path.join(PATH_VAL_SET, 'COCO_val2014_' + str(img_id).zfill(12) + '.jpg')
+        anchor_img = transform(Image.open(anchor_path).convert('RGB')).to(device)
+
+        # Get embedding
+        with torch.no_grad():
+            anchor_out = model(anchor_img.float()).cpu().numpy() # (1, 2048)
+        for label in labels:
+            pred_embds.append(anchor_out.squeeze(0))
+            true_labels.append(label)
+    
+    # get the labels name
+    instances_path = '/ghome/group07/mcv/datasets/C5/COCO/instances_val2014.json'
+    captions = []
+    with open(instances_path, 'r') as f:
+        data = json.load(f)
+    category_dict = {cat['id']: cat['name'] for cat in data["categories"]}
+    for label in true_labels:
+        #print(f'Label: {label} category_dict[{label}] = {category_dict[int(label)]}')
+        captions.append(category_dict[int(label)])
+        
+    features_x = np.array(pred_embds)
+    # Aqui pillo la primera label pero deveriamos pillar todas...
+    features_y = np.array(true_labels)
+    # display_tsne_plot(features_x, features_y, captions, title="TSNE_3epochs_margin05")
 
 
-
-
-
-
-
-
-
-    sys.exit()
-          
-
-
-
-    # path_ids_train = './data/custom_ids/train.pkl'
-    # path_labels_train = './data/custom_ids/train.pkl'
-    # utils.save_custom_data(object_annotations["train"], path_ids_train, path_labels_train)
-
-
-    '''
-    test_ids=[]
-    for i in enumerate(object_labelations['test']):
-        for j in range(len(object_labelations['test'][i[1]])):
-            test_ids.append(object_labelations['test'][i[1]][j])
-    test_ids=list(set(test_ids))
-
-
-    print("len de test: "+str(len(test_ids)))
-
-    val_ids=[]
-    for i in enumerate(object_labelations['val']):
-        for j in range(len(object_labelations['val'][i[1]])):
-            val_ids.append(object_labelations['val'][i[1]][j])
-    val_ids=list(set(val_ids))
-
-    print("len de val:" +str(len(val_ids)))
-    '''
-    train_ids=[]
-    train_dict = {}
-    for object_label in object_labelations['train']:
-        object_labels.append(int(object_label))
-        for j in range(len(object_labelations['train'][object_label])):
-            train_ids.append(object_labelations['train'][object_label][j])
-            img_id = object_labelations['train'][object_label][j]
-            #img = Image.open(os.path.join(PATH_TRAINING_SET, 'COCO_train2014_' + str(img_id).zfill(12) + '.jpg')).convert('RGB')
-            img = object_label
-            if img_id not in train_dict.keys():
-                train_dict[img_id] = [img]
-            else:
-                train_dict[img_id].append(img)
-        print(train_dict)
-        sys.exit()
-        train_imgs.append((img, label))
-    #print(train_imgs)
-    #train_ids=list(set(train_ids))
-    object_labels = sorted(object_labels)
-    print("len labels", len(object_labels))
-    for label in object_labels:
-        print(label)
+    # Train retrieval KNN ========================================================
+    knn = KNeighborsClassifier(n_neighbors=1)
+    knn.fit(features_x, features_y)
+    pred_labels = knn.predict(features_x)
+    pred_labels = np.array(pred_labels)
+    display_tsne_plot(features_x, pred_labels, captions, title="KNN_Predicted_Embeddings_TSNE_3epochs_margin05")
+    accuracy_test = accuracy_score(features_y, pred_labels)  # Test data true labels
+    #utils.plot_prec_rec_curve_multiclass(features_y, pred_labels, output="./precision_recall_plot.png", n_classes=80)
+    print(f"Test Accuracy: {accuracy_test * 100:.2f}%")
 
     
-    sys.exit()
-
-    print("len de train: "+str(len(train_ids)))
-    database_ids=[]
-    for i in enumerate(object_labelations['database']):
-        for j in range(len(object_labelations['database'][i[1]])):
-            database_ids.append(object_labelations['database'][i[1]][j])
-    database_ids=list(set(database_ids))
-
-    print("len de db: "+str(len(database_ids)))
 
 
     
-    #register_coco_instances("my_dataset_train", {}, PATH_INSTANCES_TRAIN, PATH_TRAINING_SET)
-    #register_coco_instances("my_dataset_val", {}, PATH_INSTANCES_VAL, PATH_VAL_SET)
-    #register_coco_instances("my_dataset_database", {}, "json_object_labelation_val.json", "path/to/image/dir")
-    #register_coco_instances("my_dataset_test", {}, "json_object_labelation_val.json", "path/to/image/dir")
-
-  
-    my_train = MetadataCatalog.get("my_dataset_val")
-    dataset_dicts = DatasetCatalog.get("my_dataset_val")
-
-    for d in random.sample(dataset_dicts, 3):
-        img = cv.imread(d["file_name"])
-        visualizer = Visualizer(img[:, :, ::-1], metadata= my_train)
-        vis = visualizer.draw_dataset_dict(d)
-        cv.imwrite('/ghome/group07/C5-W3/images_a/image_COCO.jpg',vis.get_image()[:, :, ::-1])
-    
- 

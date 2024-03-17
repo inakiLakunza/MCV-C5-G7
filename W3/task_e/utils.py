@@ -1,6 +1,11 @@
 import pickle
 import sys
 import random
+from sklearn.metrics import precision_recall_curve, average_precision_score
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.preprocessing import label_binarize
+
 
 def save_custom_data(chosen_set, path_ids, path_labels):
     imgs_ids = []
@@ -73,6 +78,25 @@ def create_image_loader(dict):
     return res
 
 
-
-
+def plot_prec_rec_curve_multiclass(y_gt, y_pred, output, n_classes):
+    y_gt_bin = label_binarize(y_gt, classes=np.arange(n_classes))
+    y_pred_bin = label_binarize(y_pred, classes=np.arange(n_classes))
     
+    precision = dict()
+    recall = dict()
+    average_precision = dict()
+    
+    for i in range(n_classes):
+        precision[i], recall[i], _ = precision_recall_curve(y_gt_bin[:, i], y_pred_bin[:, i])
+        average_precision[i] = average_precision_score(y_gt_bin[:, i], y_pred_bin[:, i])
+        
+    # Plot each class
+    for i in range(n_classes):
+        plt.plot(recall[i], precision[i], lw=2, label=f'Class {i} AP={average_precision[i]:.2f}')
+        
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title(f'Precision-Recall curve: mAP={np.mean(list(average_precision.values())):.2f}')
+    plt.legend(loc='best')
+    plt.savefig(output)
+    plt.close()

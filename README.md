@@ -14,3 +14,9 @@ We had to implement the Detectron2 pipeline to use Masked R-CNN and Faster R-CNN
 
 ![summaryslide W2](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W2/summary_slide_G7_W2.png)
 
+
+## Week 3: Image retrieval
+We had to trained a series of models with Contrastive Learning,  building first the embeddings and then performing image retrieval onto those.
+
+![summaryslide W3](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W3/summary_slide_G7_W3.png)
+
