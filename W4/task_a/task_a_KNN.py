@@ -1,6 +1,8 @@
 import os
 import sys
 
+import io
+
 import numpy as np
 import math
 import pickle
@@ -19,13 +21,12 @@ from sklearn.manifold import TSNE
 from task_a import EmbeddingLayer, Model
 from dataloader import Dataset
 
+from matplotlib.lines import Line2D
+
 distinct_colors = [
-        [r / 255, g / 255, b / 255]
-        for r, g, b in [
             [255, 0, 0],    # Red
-            [0, 0, 255],    # Blue
-        ]
-    ]
+            [0, 0, 255]   # Blue
+]
 
 def tsne_embeddings(model, dataloader, title="TSNE_plot_task_a"):
 
@@ -70,18 +71,34 @@ def tsne_embeddings(model, dataloader, title="TSNE_plot_task_a"):
 
         counter += 1
     '''
+
+
+    class CPU_Unpickler(pickle.Unpickler):
+        def find_class(self, module, name):
+            if module == 'torch.storage' and name == '_load_from_bytes':
+                return lambda b: torch.load(io.BytesIO(b), map_location='cpu')
+            else: return super().find_class(module, name)
+
+    ...
+    #contents = pickle.load(f) becomes...
+    #contents = CPU_Unpickler(f).load()
         
     with open('all_imgs_embds.pkl', 'rb') as f:
-        all_imgs_embds = pickle.load(f)
+        #all_imgs_embds = torch.load(f, map_location=torch.device('cpu'))
+        all_imgs_embds = CPU_Unpickler(f).load()
     with open('all_captions_embds.pkl', 'rb') as f:
-        all_captions_embds = pickle.load(f)
+        #all_captions_embds = torch.load(f, map_location=torch.device('cpu'))
+        all_captions_embds = CPU_Unpickler(f).load()
     with open('all_ids.pkl', 'rb') as f:
-        all_ids = pickle.load(f)
+        #all_ids = torch.load(f, map_location=torch.device('cpu'))
+        all_ids = CPU_Unpickler(f).load()
 
     n_imgs, n_txt = len(all_imgs_embds), len(all_captions_embds)
 
+    all_ids = [x.tolist() for x in all_ids]
+
     all_embds = all_imgs_embds + all_captions_embds
-    all_embds = [x.detach().numpy() for x in all_embds]
+    all_embds = [x.detach().cpu().numpy() for x in all_embds]
     all_colors = [0]*n_imgs + [1]*n_txt
     all_colors_column = [[x] for x in all_colors]
     features_data = np.hstack([all_embds, all_colors_column])
@@ -89,18 +106,21 @@ def tsne_embeddings(model, dataloader, title="TSNE_plot_task_a"):
     N_COMPONENTS = 2
     out_tsne = TSNE(n_components=N_COMPONENTS, verbose=1, metric='euclidean').fit_transform(features_data)
 
-    df = pd.DataFrame(dict(x=out_tsne[:, 0], y=out_tsne[:, 1], label=all_ids))
+    df = pd.DataFrame(dict(x=out_tsne[:, 0], y=out_tsne[:, 1], label=all_colors))
+    df['label'] = df['label'].replace({0: 'Images', 1: 'Text'})
     sns.set_style("whitegrid")
-    sns.scatterplot(x="x", y="y", hue="label", palette=distinct_colors, data=df, legend=True)
-    
-    for ii, label in enumerate(all_imgs_embds):
-        plt.annotate(label, (out_tsne[ii, 0], out_tsne[ii, 1]), color="black", alpha=0.5)
-    for ii, label in enumerate(all_captions_embds):
-        plt.annotate(label, (out_tsne[ii+n_imgs, 0], out_tsne[ii+n_imgs, 1]), color="black", alpha=0.5)
-    
+    sns.scatterplot(x="x", y="y", hue="label", data=df, legend=True)
+
+    for ii, label in enumerate(all_ids + all_ids):
+        plt.annotate(str(label), (out_tsne[ii, 0], out_tsne[ii, 1]), color="black", alpha=0.5, fontsize=4)
+        
     plt.title(title)
-    #plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.savefig(f'./{title}2.png', dpi=300)
+    # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    
+    # plt.legend(handles=[plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=5, label='Images'), 
+                        # plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='orange', markersize=5, label='Captions')], title='Legend')
+
+    plt.savefig(f'./{title}.png', dpi=300, bbox_inches='tight')
 
 
 

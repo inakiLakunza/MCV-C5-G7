@@ -69,7 +69,7 @@ class Model():
         self.optimizer = optim.Adam(self.embedding_model.parameters(), lr=2e-5)
         #==========================================================
 
-    def train_img_to_text(self, dataloader, n_epochs=3, save_path='./weigths/model_img_task_b_3epoch.pth') -> None:
+    def train_img_to_text(self, dataloader, n_epochs=3, save_path='./weights/model_img_task_b_3epoch.pth') -> None:
         self.embedding_model.train()
         self.model_img.eval()
 

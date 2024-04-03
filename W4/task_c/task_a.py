@@ -1,3 +1,4 @@
+
 import os
 import sys
 sys.path.append('./..') 
@@ -12,11 +13,13 @@ import torch
 import torch.optim as optim
 from torchvision import transforms
 
-import fasttext
+from transformers import BertTokenizer, BertModel
+
 from dataloader import Dataset
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 
 from tqdm import tqdm
+
 
 
 # EMBEDDING LAYER
@@ -24,7 +27,8 @@ from tqdm import tqdm
 class EmbeddingLayer(torch.nn.Module):
     def __init__(self, embed_size):
         super(EmbeddingLayer, self).__init__()
-        self.text_linear = torch.nn.Linear(300, embed_size)
+        # BERT EMBEDDING SIZE: 768
+        self.text_linear = torch.nn.Linear(768, embed_size)
         self.image_linear = torch.nn.Linear(4096, embed_size)
         self.activation = torch.nn.ReLU()
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -59,8 +63,9 @@ class Model():
 
         # MODEL FOR TEXT
         #==========================================================
-        print("Loading FastText...")
-        self.model_txt = fasttext.load_model('./../../mcv/C5/fasttext_wiki.en.bin')
+        print("Loading BERT...")
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.model_txt = BertModel.from_pretrained('bert-base-uncased')
         #==========================================================
 
         # LOSSES AND OPTIMIZERS
@@ -69,7 +74,7 @@ class Model():
         self.optimizer = optim.Adam(self.embedding_model.parameters(), lr=2e-5)
         #==========================================================
 
-    def train_img_to_text(self, dataloader, n_epochs=3, save_path='./weights/model_img_task_a_3epoch.pth') -> None:
+    def train_img_to_text(self, dataloader, n_epochs=1, save_path='./weights/model_img_task_c_a_1epoch.pth') -> None:
         self.embedding_model.train()
         self.model_img.eval()
 
@@ -84,17 +89,30 @@ class Model():
                 anchor_img = anchor_img.float() # (bs, 3, 224, 224)
                 anchor_out = self.model_img(anchor_img) # (bs, 4096)
 
-                # Text Embeddings
-                text_vecs = []
-                for caption in captions:
-                    word_vecs = []
-                    for word in caption.split():
-                        if word.lower() in self.model_txt:
-                            word_vecs.append(torch.tensor(self.model_txt[word.lower()]))
-                    text_vecs.append(torch.stack(word_vecs).mean(dim=0))
-                text_vecs = torch.stack(text_vecs).to(self.device)
+                
+                # BERT
+                #========================================================
+                encoding = self.tokenizer.batch_encode_plus(
+                    captions,                    # List of input texts
+                    padding=True,              # Pad to the maximum sequence length
+                    truncation=True,           # Truncate to the maximum sequence length if necessary
+                    return_tensors='pt',      # Return PyTorch tensors
+                    add_special_tokens=True    # Add special tokens CLS and SEP
+                )
+                
+                input_ids = encoding['input_ids']  # Token IDs
+                attention_mask = encoding['attention_mask']  # Attention mask
 
-                pos_embds = self.embedding_model.preforward_text(text_vecs) # (bs, 4096)
+                with torch.no_grad():
+                    outputs = self.model_txt(input_ids, attention_mask=attention_mask)
+                    word_embeddings = outputs.last_hidden_state  # This contains the embeddings
+                
+                # Compute the average of word embeddings to get the sentence embedding
+                sentence_embedding = word_embeddings.mean(dim=1).to(self.device)   # Average pooling along the sequence length dimension
+                #========================================================
+
+                
+                pos_embds = self.embedding_model.preforward_text(sentence_embedding) # (bs, 4096)
                 neg_embds = torch.roll(pos_embds, shifts=-1, dims=0) # (bs, 4096)
 
                 # Compute Triplet Loss
@@ -122,9 +140,4 @@ if __name__ == '__main__':
     dataset_train = Dataset(train_model)
     dataloader_train = DataLoader(dataset_train, batch_size=32, drop_last=True, shuffle=True)
     model.train_img_to_text(dataloader_train)
-
-
-
-
-
 
