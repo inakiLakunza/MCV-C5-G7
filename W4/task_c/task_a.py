@@ -41,7 +41,9 @@ class EmbeddingLayer(torch.nn.Module):
         return x
 
     def preforward_text(self, x):
-        return self.text_linear(x)
+        x = self.activation(x)
+        x = self.text_linear(x)
+        return x
     
 #=========================================================================================================
 

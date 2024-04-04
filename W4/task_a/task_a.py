@@ -21,23 +21,30 @@ from tqdm import tqdm
 
 # EMBEDDING LAYER
 #=========================================================================================================
-class EmbeddingLayer(torch.nn.Module):
-    def __init__(self, embed_size):
-        super(EmbeddingLayer, self).__init__()
-        self.text_linear = torch.nn.Linear(300, embed_size)
-        self.image_linear = torch.nn.Linear(4096, embed_size)
+class ImageEmbeddingLayer(torch.nn.Module):
+    def __init__(self):
+        super(ImageEmbeddingLayer, self).__init__()
+        self.image_linear = torch.nn.Linear(4096, 1000)
         self.activation = torch.nn.ReLU()
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
     def forward(self, x):
-        #print(f'Lo que le llega en nuestro embedding {x["pool"].shape} {x["0"].shape} {x["1"].shape} {x["2"].shape}')
         x = x["pool"].flatten(start_dim=1)
         x = self.activation(x)
         x = self.image_linear(x)
         return x
+    
+class TextEmbeddingLayer(torch.nn.Module):
+    def __init__(self):
+        super(TextEmbeddingLayer, self).__init__()
+        self.text_linear = torch.nn.Linear(300, 1000)
+        self.activation = torch.nn.ReLU()
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    def preforward_text(self, x):
-        return self.text_linear(x)
+    def forward(self, x):
+        x = self.activation(x)
+        x = self.text_linear(x)
+        return x
     
 #=========================================================================================================
 
@@ -47,13 +54,14 @@ class Model():
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
         print("Loading EmbeddingLayer...")
-        self.embedding_model = EmbeddingLayer(embed_size=4096).to(self.device)
+        self.image_model = ImageEmbeddingLayer().to(self.device)
+        self.text_model = TextEmbeddingLayer().to(self.device)
 
          # MODEL FOR IMGS
         #==========================================================
         print("Loading FasterRCNN...")
         self.model_img = fasterrcnn_resnet50_fpn(weights='COCO_V1').backbone
-        self.model_img = torch.nn.Sequential(*list(self.model_img.children())[:], self.embedding_model)
+        self.model_img = torch.nn.Sequential(*list(self.model_img.children())[:], self.image_model)
         self.model_img.to(self.device)
         #==========================================================
 
@@ -66,11 +74,16 @@ class Model():
         # LOSSES AND OPTIMIZERS
         #==========================================================
         self.triplet_loss = torch.nn.TripletMarginLoss(margin=0.5, p=2, eps=1e-7)
-        self.optimizer = optim.Adam(self.embedding_model.parameters(), lr=2e-5)
+        params = list(self.image_model.parameters()) + list(self.text_model.parameters())
+        self.optimizer = optim.AdamW(params, lr=2e-5, weight_decay=0.)
         #==========================================================
 
-    def train_img_to_text(self, dataloader, n_epochs=3, save_path='./weights/model_img_task_a_3epoch.pth') -> None:
-        self.embedding_model.train()
+    def train_img_to_text(self, dataloader, n_epochs=4, save_path_img='./weights/image_model_task_a_1epoch_embed_1000.pth', save_path_txt='./weights/text_model_task_a_1epoch_embed_1000.pth') -> None:
+        # Embedding Models
+        self.image_model.train()
+        self.text_model.train()
+
+        # Faster
         self.model_img.eval()
 
         for epoch in range(n_epochs):
@@ -94,8 +107,8 @@ class Model():
                     text_vecs.append(torch.stack(word_vecs).mean(dim=0))
                 text_vecs = torch.stack(text_vecs).to(self.device)
 
-                pos_embds = self.embedding_model.preforward_text(text_vecs) # (bs, 4096)
-                neg_embds = torch.roll(pos_embds, shifts=-1, dims=0) # (bs, 4096)
+                pos_embds = self.text_model.forward(text_vecs) # (bs, 1000)
+                neg_embds = torch.roll(pos_embds, shifts=-1, dims=0) # (bs, 1000)
 
                 # Compute Triplet Loss
                 loss = self.triplet_loss(anchor_out, pos_embds, neg_embds)
@@ -108,7 +121,8 @@ class Model():
             print(f'EPOCH {epoch} Avg Triplet Loss: {torch.Tensor(running_loss).mean()}')
                 
         os.makedirs("./weights", exist_ok=True)
-        torch.save(self.embedding_model.state_dict(), save_path)
+        torch.save(self.model_img.state_dict(), save_path_img)
+        torch.save(self.text_model.state_dict(), save_path_txt)
 
         # SAVE EMBEDDINGS
 

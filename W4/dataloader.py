@@ -52,3 +52,7 @@ class Dataset():
 
         return anchor_img, caption, id
 
+    def get_random_image(self):
+        random_index = random.randint(0, len(self.info) - 1)
+        return self.__getitem__(random_index)
+
