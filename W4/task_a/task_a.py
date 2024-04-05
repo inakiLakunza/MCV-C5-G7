@@ -78,7 +78,7 @@ class Model():
         self.optimizer = optim.AdamW(params, lr=2e-5, weight_decay=0.)
         #==========================================================
 
-    def train_img_to_text(self, dataloader, n_epochs=4, save_path_img='./weights/image_model_task_a_1epoch_embed_1000.pth', save_path_txt='./weights/text_model_task_a_1epoch_embed_1000.pth') -> None:
+    def train_img_to_text(self, dataloader, n_epochs=4, save_path_img='./weights/image_model_task_a_4epoch_embed_1000.pth', save_path_txt='./weights/text_model_task_a_1epoch_embed_1000.pth') -> None:
         # Embedding Models
         self.image_model.train()
         self.text_model.train()

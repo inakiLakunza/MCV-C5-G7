@@ -18,8 +18,7 @@ from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.manifold import TSNE
 
-from task_a import Model
-# from task_b import Model
+from task_b import Model
 
 from dataloader import Dataset
 
@@ -86,7 +85,7 @@ def get_embeddings(img_model, txt_model, dataloader,
         all_imgs_embds = []
         all_captions_embds = []
         all_ids = []
-        all_captions = []
+        all_images = []
 
         counter = 0
 
@@ -98,11 +97,12 @@ def get_embeddings(img_model, txt_model, dataloader,
             # Image Embeddings
             anchor_img = anchor_img.float() # (bs, 3, 224, 224)
             anchor_out = img_model(anchor_img) # (bs, 4096)
+            numpy_images = anchor_img.permute(0, 2, 3, 1).cpu().numpy()  # Convert to (bs, 224, 224, 3)
+            all_images.extend(numpy_images)
 
             # Text Embeddings
             text_vecs = []
             for caption in captions:
-                all_captions.append(caption)
                 word_vecs = []
                 for word in caption.split():
                     if word.lower() in model.model_txt:
@@ -130,20 +130,20 @@ def get_embeddings(img_model, txt_model, dataloader,
             with open(f"./pickles/{wanted_embeds}/imgs.pkl", "wb") as file:
                 pickle.dump(all_imgs_embds, file)
 
-    return all_imgs_embds, all_captions_embds, all_ids, all_captions
+    return all_imgs_embds, all_captions_embds, all_ids, all_images
 
 
 
 
 
-def tsne_embeddings(img_model, txt_model, dataloader, title="TSNE_plot_task_a_4epochs",
-                    max_samples=150,
+def tsne_embeddings(img_model, txt_model, dataloader, title="TSNE_plot_task_a",
+                    max_samples=100,
                     use_saved_pickles = False,
                     wanted_embeds = "task_a",
                     save_pickles=False
                     ):
 
-    all_imgs_embds, all_captions_embds, all_ids, _ = get_embeddings(img_model, txt_model, dataloader,
+    all_imgs_embds, all_captions_embds, all_ids = get_embeddings(img_model, txt_model, dataloader,
                                                                  max_samples=max_samples,
                                                                  use_saved_pickles=use_saved_pickles,
                                                                  wanted_embeds=wanted_embeds,
@@ -177,7 +177,7 @@ def tsne_embeddings(img_model, txt_model, dataloader, title="TSNE_plot_task_a_4e
     # plt.legend(handles=[plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=5, label='Images'), 
                         # plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='orange', markersize=5, label='Captions')], title='Legend')
 
-    plt.savefig(f'./despues_task_a_4_epochs.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'./despues.png', dpi=300, bbox_inches='tight')
 
 
 def pk(actual, predicted, k=10):
@@ -232,7 +232,7 @@ def mpk(actual, predicted, k=10):
         pk_list.append(score)
     return np.mean(pk_list)
 
-def get_top_K_neighbors_and_distances(fit_features_x, fit_features_y, features_to_predict, n_neighbors=5):
+def get_top_K_neighbors_and_distances(fit_features_x, fit_features_y, features_to_predict, n_neighbors=10):
     knn = KNeighborsClassifier(n_neighbors=n_neighbors)
     knn.fit(fit_features_x, fit_features_y)
     distances, indices = knn.kneighbors(features_to_predict, return_distance=True)
@@ -269,69 +269,68 @@ def order_neighbors_by_distance(neighbors, distances):
     return sorted_neighbors, sorted_distances
 
 
-def show_img_and_related_captions(img, knn, captions_fit, fit_features_y, gt_caption, image_id):
+def show_caption_and_related_images(anchor_caption, knn, all_images_train, fit_features_y, gt_img, id):
+    # Text Embeddings
+    text_vecs = []
+    for caption in [anchor_caption]:
+        word_vecs = []
+        for word in caption.split():
+            if word.lower() in model.model_txt:
+                word_vecs.append(torch.tensor(model.model_txt[word.lower()]))
+        text_vecs.append(torch.stack(word_vecs).mean(dim=0))
+    text_vecs = torch.stack(text_vecs).to(model.device)
 
-    image_tensor = img.clone().detach()
+    txt_emb = txt_model(text_vecs) # (bs, 4096)
 
-    if image_tensor.is_cuda:
-        image_tensor = image_tensor.cpu()
-
-    image_np = image_tensor.detach().cpu().numpy()
-
-    image_np = np.transpose(image_np, (1, 2, 0))
-
-    img = img.float() # (bs, 3, 224, 224)
-    img_emb = img_model(img) # (bs, 4096)
-
-    distance, neighbors = knn.kneighbors(img_emb.detach().cpu().numpy(), return_distance=True)
+    distance, neighbors = knn.kneighbors(txt_emb.detach().cpu().numpy(), return_distance=True)
     neighbors, distances = order_neighbors_by_distance(fit_features_y[neighbors], distance)
 
     neighbors = neighbors[0].tolist()
     indexes = [np.where(fit_features_y == x)[0].tolist()[0] for x in neighbors]
 
-    captions = [gt_caption] + [captions_fit[x] for x in indexes]
+    unique_indexes = []
+    for idx in indexes: 
+        if idx not in unique_indexes:
+            unique_indexes.append(idx)
+        if len(unique_indexes) == 5: 
+            break
+    print(f'Unique indexes: {unique_indexes}')
 
-    os.makedirs('./results_task_a/', exist_ok=True)
+    # Check to ensure we have enough unique images
+    if len(unique_indexes) < 5:
+        print("Not enough unique predicted images found.")
+        return
 
-    fig, ax = plt.subplots(figsize=(12, 6))
-    ax.axis('off')
-    
-    # Image
-    img_ax = fig.add_axes([0.05, 0.1, 0.4, 0.8])  # Increased left padding
-    img_ax.imshow(image_np)
-    img_ax.set_title(f"Image with ID {image_id}", fontsize=16)  # Increased title font size
-    img_ax.axis('off')
+    # Directory for saving the results
+    os.makedirs('./results_task_b_own_examples/', exist_ok=True)
 
-    gt_title_ax = fig.add_axes([0.55, 0.85, 0.4, 0.05])
-    gt_title_ax.text(0.5, 0.5, "Ground Truth Caption", va='center', ha='center', fontsize=14)
-    gt_title_ax.axis('off')
+    # Initialize the figure
+    fig = plt.figure(figsize=(15, 10))
 
-    gt_cap_ax = fig.add_axes([0.55, 0.75, 0.4, 0.1])
-    gt_cap_ax.text(0.5, 0.5, gt_caption, va='center', ha='center', fontsize=14, wrap=True, 
-                   bbox=dict(facecolor='green', alpha=0.5))
-    gt_cap_ax.axis('off')
+    # Caption as the title
+    plt.suptitle(anchor_caption, fontsize=20, backgroundcolor='lightgray', y=0.95)
 
-    ax.plot([0.55, 0.95], [0.73, 0.73], color="black", linestyle="--", transform=fig.transFigure, clip_on=False)
+    # GT Image in the center
+    gt_img_ax = fig.add_subplot(2, 1, 1) 
+    gt_img_np = gt_img.permute(1, 2, 0).cpu().numpy() if isinstance(gt_img, torch.Tensor) else gt_img
+    gt_img_ax.imshow(gt_img_np)
+    gt_img_ax.add_patch(plt.Rectangle((-0.05, -0.05), 1.1, 1.1, fill=False, edgecolor='green', lw=4, transform=gt_img_ax.transAxes))
+    gt_img_ax.set_title("GT Image", fontsize=18)
+    gt_img_ax.axis('off')
 
-    pred_title_ax = fig.add_axes([0.55, 0.65, 0.4, 0.05])
-    pred_title_ax.text(0.5, 0.5, "Predicted Captions", va='center', ha='center', fontsize=14)
-    pred_title_ax.axis('off')
-
-    for i, caption in enumerate(captions[1:], start=1):
-        pred_cap_ax = fig.add_axes([0.55, 0.65 - i*0.13, 0.4, 0.12])
-        pred_cap_ax.text(0.5, 0.5, caption, va='center', ha='center', fontsize=12, wrap=True,
-                         bbox=dict(facecolor='lightgray', alpha=0.5))
-        pred_cap_ax.axis('off')
+    for i, index in enumerate(unique_indexes[:5]):
+        pred_img_ax = fig.add_subplot(2, 5, 6+i) 
+        pred_img_np = all_images_train[index].permute(1, 2, 0).cpu().numpy() if isinstance(all_images_train[index], torch.Tensor) else all_images_train[index]
+        pred_img_ax.imshow(pred_img_np)
+        pred_img_ax.axis('off')
 
     pid = str(uuid4())
-    plt.savefig(os.path.join(f"./results_task_a/{pid}.png"), bbox_inches='tight', pad_inches=0.5)
+    save_path = os.path.join(f"./results_task_b_own_examples/{pid}.png")
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # Adjust the layout
+    plt.savefig(save_path, bbox_inches='tight', pad_inches=0.5)
+    plt.close(fig)
 
-    print(f'captions:')
-    for caption in captions:
-        print(caption)
-
-    print(f"Saved on {os.path.join(f'./results_task_a/{pid}.png')}")
-
+    print(f"Saved on {save_path}")
 
 
 
@@ -341,12 +340,9 @@ if __name__ == "__main__":
     if not USE_PICKLE_INFO:
         #LOAD SAVED MODEL
         #========================================================
-        # task_a
-        WEIGHT_SAVE_PATH_TXT = './weights/text_model_task_a_4epoch_embed_1000.pth'
-        WEIGHT_SAVE_PATH_IMG = './weights/image_model_task_a_4epoch_embed_1000.pth'
         # task_b
-        # WEIGHT_SAVE_PATH_TXT = './weights/text_model_task_b_1epoch_embed_256.pth'
-        # WEIGHT_SAVE_PATH_IMG = './weights/image_model_task_b_1epoch_embed_256.pth'
+        WEIGHT_SAVE_PATH_TXT = './weights/old_weights/text_model_task_b_1epoch_embed_256.pth'
+        WEIGHT_SAVE_PATH_IMG = './weights/old_weights/image_model_task_b_1epoch_embed_256.pth'
 
         model = Model()
 
@@ -367,11 +363,12 @@ if __name__ == "__main__":
         model = None
         dataloader_val = None
 
-    tsne_embeddings(img_model, txt_model, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings after the alignment")
+    # tsne_embeddings(img_model, txt_model, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings after the alignment")
 
-    sys.exit()
-    imgs_embds_fit, captions_embds_fit, ids_fit, captions_train = get_embeddings(img_model, txt_model, dataloader_train, max_samples=200, save_pickles=False)
-    imgs_embds_retrieve, captions_embds_retrieve, ids_retrieve, captions_val= get_embeddings(img_model, txt_model, dataloader_val, max_samples=200, save_pickles=False)
+    imgs_embds_fit, captions_embds_fit, ids_fit, all_images_train = get_embeddings(img_model, txt_model, dataloader_train, max_samples=200, save_pickles=False)
+    imgs_embds_retrieve, captions_embds_retrieve, ids_retrieve, all_images_val = get_embeddings(img_model, txt_model, dataloader_val, max_samples=200, save_pickles=False)
+    ids_retrieve = [x.tolist() for x in ids_retrieve]
+    captions_embds_retrieve = [x.detach().cpu().numpy() for x in captions_embds_retrieve]
 
     imgs_embds_fit = [x.detach().cpu().numpy() for x in imgs_embds_fit]
 
@@ -379,14 +376,26 @@ if __name__ == "__main__":
     captions_embds_fit = [x.detach().cpu().numpy() for x in captions_embds_fit]
     ids_fit = [x.tolist() for x in ids_fit]
 
-    sorted_neighbors, knn = get_top_K_neighbors_and_distances(np.array(captions_embds_fit), np.array(ids_fit), np.array(imgs_embds_fit), n_neighbors=5)
+    sorted_neighbors, knn = get_top_K_neighbors_and_distances(np.array(imgs_embds_fit), np.array(ids_fit), np.array(captions_embds_fit), n_neighbors=10)
     print(compute_mapk_1_5(sorted_neighbors, ids_fit))
 
-    '''
-    n_examples = 4
+    n_examples = 20
+    own_anchors = [
+        "Picture of a group of women preparing food. ",
+        "Image of an adult man using his mobilphone. ",
+        "Picture of an airplane preparing to take off. "
+
+    ]
     for n in range(n_examples):
-        anchor_img, caption, id = dataset_train.get_random_image()
-        print(f'Image ID: {id} \n Ground Truth Caption = "{caption}"')
-        show_img_and_related_captions(anchor_img, knn, captions_train, np.array(ids_fit), caption, id)
-    '''
-        
+        img, anchor_caption, id = dataset_val.get_random_image()
+        #img, _, id = dataset_train.get_random_image()
+        #anchor_caption = own_anchors[n]
+        print(f'Caption with ID: {id} = "{anchor_caption}"')
+        show_caption_and_related_images(
+            anchor_caption, 
+            knn, 
+            all_images_train, 
+            np.array(ids_fit), 
+            img, 
+            id
+        )
