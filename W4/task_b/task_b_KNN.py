@@ -94,11 +94,11 @@ def get_embeddings(img_model, txt_model, dataloader,
 
             if counter > max_samples: break
 
+            #print(anchor_img)
+
             # Image Embeddings
             anchor_img = anchor_img.float() # (bs, 3, 224, 224)
             anchor_out = img_model(anchor_img) # (bs, 4096)
-            numpy_images = anchor_img.permute(0, 2, 3, 1).cpu().numpy()  # Convert to (bs, 224, 224, 3)
-            all_images.extend(numpy_images)
 
             # Text Embeddings
             text_vecs = []
@@ -110,12 +110,12 @@ def get_embeddings(img_model, txt_model, dataloader,
                 text_vecs.append(torch.stack(word_vecs).mean(dim=0))
             text_vecs = torch.stack(text_vecs).to(model.device)
 
-            pos_embds = txt_model(text_vecs) # (bs, 4096)
+            text_embds = txt_model.forward(text_vecs) # (bs, 4096)
 
 
             # Add the Batch's imgs, captions and ID's to the full lists
             all_imgs_embds.extend(anchor_out)
-            all_captions_embds.extend(pos_embds)
+            all_captions_embds.extend(text_embds)
             all_ids.extend(ids)
 
             counter += 1
@@ -136,14 +136,15 @@ def get_embeddings(img_model, txt_model, dataloader,
 
 
 
-def tsne_embeddings(img_model, txt_model, dataloader, title="TSNE_plot_task_a",
+def tsne_embeddings(img_model, txt_model, dataloader, title="TSNE_plot_task_b",
                     max_samples=100,
                     use_saved_pickles = False,
-                    wanted_embeds = "task_a",
-                    save_pickles=False
+                    wanted_embeds = "task_b",
+                    save_pickles=False,
+                    img_name="try_img"
                     ):
-
-    all_imgs_embds, all_captions_embds, all_ids = get_embeddings(img_model, txt_model, dataloader,
+    plt.clf()
+    all_imgs_embds, all_captions_embds, all_ids, _ = get_embeddings(img_model, txt_model, dataloader,
                                                                  max_samples=max_samples,
                                                                  use_saved_pickles=use_saved_pickles,
                                                                  wanted_embeds=wanted_embeds,
@@ -177,7 +178,7 @@ def tsne_embeddings(img_model, txt_model, dataloader, title="TSNE_plot_task_a",
     # plt.legend(handles=[plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=5, label='Images'), 
                         # plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='orange', markersize=5, label='Captions')], title='Legend')
 
-    plt.savefig(f'./despues.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'./{img_name}.png', dpi=300, bbox_inches='tight')
 
 
 def pk(actual, predicted, k=10):
@@ -341,8 +342,13 @@ if __name__ == "__main__":
         #LOAD SAVED MODEL
         #========================================================
         # task_b
-        WEIGHT_SAVE_PATH_TXT = './weights/old_weights/text_model_task_b_1epoch_embed_256.pth'
-        WEIGHT_SAVE_PATH_IMG = './weights/old_weights/image_model_task_b_1epoch_embed_256.pth'
+        WEIGHT_SAVE_PATH_TXT = './weights/text_model_task_b_1epoch_embed_256.pth'
+        WEIGHT_SAVE_PATH_IMG = './weights/image_model_task_b_1epoch_embed_256.pth'
+
+
+        model_no_train = Model()
+        txt_model_no_train = model_no_train.text_model
+        img_model_no_train = model_no_train.model_img
 
         model = Model()
 
@@ -363,7 +369,9 @@ if __name__ == "__main__":
         model = None
         dataloader_val = None
 
-    # tsne_embeddings(img_model, txt_model, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings after the alignment")
+    tsne_embeddings(img_model_no_train, txt_model_no_train, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings before the alignment", img_name="before_b")
+    tsne_embeddings(img_model, txt_model, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings after the alignment", img_name="after_b")
+
 
     imgs_embds_fit, captions_embds_fit, ids_fit, all_images_train = get_embeddings(img_model, txt_model, dataloader_train, max_samples=200, save_pickles=False)
     imgs_embds_retrieve, captions_embds_retrieve, ids_retrieve, all_images_val = get_embeddings(img_model, txt_model, dataloader_val, max_samples=200, save_pickles=False)

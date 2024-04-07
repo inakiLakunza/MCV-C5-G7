@@ -58,7 +58,7 @@ class Model():
         print("Loading EmbeddingLayer...")
         self.image_model = ImageEmbeddingLayer().to(self.device)
         self.text_model = TextEmbeddingLayer().to(self.device)
-         # MODEL FOR IMGS
+        # MODEL FOR IMGS
         #==========================================================
         print("Loading FasterRCNN...")
         self.model_img = fasterrcnn_resnet50_fpn(weights='COCO_V1').backbone

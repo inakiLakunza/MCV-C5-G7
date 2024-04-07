@@ -53,7 +53,7 @@ class Model():
     def __init__(self):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        print("Loading EmbeddingLayer...")
+        print("Loading EmbeddingLayers...")
         self.image_model = ImageEmbeddingLayer().to(self.device)
         self.text_model = TextEmbeddingLayer().to(self.device)
 

@@ -98,7 +98,7 @@ def get_embeddings(img_model, txt_model, dataloader,
 
             # BERT
             #========================================================
-            encoding = txt_model.tokenizer.batch_encode_plus(
+            encoding = model.tokenizer.batch_encode_plus(
                 captions,                    # List of input texts
                 padding=True,              # Pad to the maximum sequence length
                 truncation=True,           # Truncate to the maximum sequence length if necessary
@@ -189,7 +189,7 @@ def tsne_embeddings(img_model, txt_model, dataloader, title="TSNE_plot_task_c_a"
     # plt.legend(handles=[plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=5, label='Images'), 
                         # plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='orange', markersize=5, label='Captions')], title='Legend')
 
-    plt.savefig(f'./despues.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'./despues2.png', dpi=300, bbox_inches='tight')
 
 
 
@@ -212,6 +212,9 @@ if __name__ == "__main__":
 
         model = Model()
 
+        txt_model = model.model_txt
+        img_model = model.model_img
+
         model.embedding_model.load_state_dict(torch.load(WEIGHT_SAVE_PATH, map_location='cpu'))
         #========================================================
 
@@ -225,7 +228,7 @@ if __name__ == "__main__":
         model = None
         dataloader_val = None
 
-    tsne_embeddings(model, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings after the alignment")
+    tsne_embeddings(img_model, txt_model, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings after the alignment")
 
 
     imgs_embds_fit, captions_embds_fit, ids_fit = get_embeddings(model, dataloader_train, max_samples=200, save_pickles=False)

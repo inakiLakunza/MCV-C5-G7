@@ -24,6 +24,39 @@ from tqdm import tqdm
 
 # EMBEDDING LAYER
 #=========================================================================================================
+
+
+class ImageEmbeddingLayer(torch.nn.Module):
+    def __init__(self):
+        super(ImageEmbeddingLayer, self).__init__()
+        self.image_linear = torch.nn.Linear(4096, 1000)
+        self.activation = torch.nn.ReLU()
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    def forward(self, x):
+        x = x["pool"].flatten(start_dim=1)
+        x = self.activation(x)
+        x = self.image_linear(x)
+        return x
+    
+
+class TextEmbeddingLayer(torch.nn.Module):
+    def __init__(self):
+        super(TextEmbeddingLayer, self).__init__()
+        self.text_linear = torch.nn.Linear(768, 1000)
+        self.activation = torch.nn.ReLU()
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    def forward(self, x):
+        x = self.activation(x)
+        x = self.text_linear(x)
+        return x
+    
+
+
+
+
+'''
 class EmbeddingLayer(torch.nn.Module):
     def __init__(self, embed_size):
         super(EmbeddingLayer, self).__init__()
@@ -46,20 +79,23 @@ class EmbeddingLayer(torch.nn.Module):
         return x
     
 #=========================================================================================================
+'''
 
 
 class Model():
     def __init__(self):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        print("Loading EmbeddingLayer...")
-        self.embedding_model = EmbeddingLayer(embed_size=4096).to(self.device)
+        print("Loading EmbeddingLayers...")
+        self.image_model = ImageEmbeddingLayer().to(self.device)
+        self.text_model = TextEmbeddingLayer().to(self.device)
+
 
          # MODEL FOR IMGS
         #==========================================================
         print("Loading FasterRCNN...")
         self.model_img = fasterrcnn_resnet50_fpn(weights='COCO_V1').backbone
-        self.model_img = torch.nn.Sequential(*list(self.model_img.children())[:], self.embedding_model)
+        self.model_img = torch.nn.Sequential(*list(self.model_img.children())[:], self.image_model)
         self.model_img.to(self.device)
         #==========================================================
 
@@ -73,11 +109,16 @@ class Model():
         # LOSSES AND OPTIMIZERS
         #==========================================================
         self.triplet_loss = torch.nn.TripletMarginLoss(margin=0.5, p=2, eps=1e-7)
-        self.optimizer = optim.Adam(self.embedding_model.parameters(), lr=2e-5)
+        params = list(self.image_model.parameters()) + list(self.text_model.parameters())
+        self.optimizer = optim.Adam(params, lr=2e-5, weight_decay=0.)
         #==========================================================
 
-    def train_img_to_text(self, dataloader, n_epochs=1, save_path='./weights/model_img_task_c_a_1epoch.pth') -> None:
-        self.embedding_model.train()
+    def train_img_to_text(self, dataloader, n_epochs=1) -> None:
+        # Embedding Models
+        self.image_model.train()
+        self.text_model.train()
+
+        # Faster
         self.model_img.eval()
 
         for epoch in range(n_epochs):
@@ -114,7 +155,7 @@ class Model():
                 #========================================================
 
                 
-                pos_embds = self.embedding_model.preforward_text(sentence_embedding) # (bs, 4096)
+                pos_embds = self.text_model.forward(sentence_embedding) # (bs, 4096)
                 neg_embds = torch.roll(pos_embds, shifts=-1, dims=0) # (bs, 4096)
 
                 # Compute Triplet Loss
@@ -126,11 +167,16 @@ class Model():
                 pbar.set_description(f"Avg Running Loss: {np.mean(running_loss):.4f}")
 
             print(f'EPOCH {epoch} Avg Triplet Loss: {torch.Tensor(running_loss).mean()}')
-                
-        os.makedirs("./weights", exist_ok=True)
-        torch.save(self.embedding_model.state_dict(), save_path)
+
 
         # SAVE EMBEDDINGS
+        save_path_img = './weights/image_model_task_a_1epoch.pth'
+        save_path_txt = './weights/text_model_task_a_1epoch.pth'
+        os.makedirs("./weights", exist_ok=True)
+        torch.save(self.model_img.state_dict(), save_path_img)
+        torch.save(self.text_model.state_dict(), save_path_txt)
+
+        
 
 
 if __name__ == '__main__':
