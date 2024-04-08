@@ -18,7 +18,7 @@ from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.manifold import TSNE
 
-from task_b import EmbeddingLayer, Model
+from task_b import ImageEmbeddingLayer, TextEmbeddingLayer, Model
 
 from dataloader import Dataset
 
@@ -93,7 +93,7 @@ def get_embeddings(img_model, txt_model, dataloader,
         for batch_idx, (anchor_img, captions, ids) in pbar:
 
             if counter > max_samples: break
-
+            all_images.extend(anchor_img)
             # Image Embeddings
             anchor_img = anchor_img.float() # (bs, 3, 224, 224)
             anchor_out = img_model(anchor_img) # (bs, 4096)
@@ -116,7 +116,7 @@ def get_embeddings(img_model, txt_model, dataloader,
             
             # Compute the average of word embeddings to get the sentence embedding
             sentence_embedding = word_embeddings.mean(dim=1).to(model.device)   # Average pooling along the sequence length dimension
-            pos_embds = model.embedding_model.preforward_text(sentence_embedding) # (bs, 4096)
+            pos_embds = txt_model(sentence_embedding) # (bs, 4096)
             #========================================================
 
 
@@ -146,11 +146,12 @@ def get_embeddings(img_model, txt_model, dataloader,
 def tsne_embeddings(img_model, txt_model, dataloader, title="TSNE_plot_task_a",
                     max_samples=100,
                     use_saved_pickles = False,
-                    wanted_embeds = "task_a",
-                    save_pickles=False
+                    wanted_embeds = "task_b",
+                    save_pickles=False,
+                    img_name="example"
                     ):
-
-    all_imgs_embds, all_captions_embds, all_ids = get_embeddings(img_model, txt_model, dataloader,
+    plt.clf()
+    all_imgs_embds, all_captions_embds, all_ids, _ = get_embeddings(img_model, txt_model, dataloader,
                                                                  max_samples=max_samples,
                                                                  use_saved_pickles=use_saved_pickles,
                                                                  wanted_embeds=wanted_embeds,
@@ -184,7 +185,7 @@ def tsne_embeddings(img_model, txt_model, dataloader, title="TSNE_plot_task_a",
     # plt.legend(handles=[plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=5, label='Images'), 
                         # plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='orange', markersize=5, label='Captions')], title='Legend')
 
-    plt.savefig(f'./despues.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'./{img_name}.png', dpi=300, bbox_inches='tight')
 
 
 def pk(actual, predicted, k=10):
@@ -277,19 +278,30 @@ def order_neighbors_by_distance(neighbors, distances):
 
 
 def show_caption_and_related_images(anchor_caption, knn, all_images_train, fit_features_y, gt_img, id):
-    # Text Embeddings
-    text_vecs = []
-    for caption in [anchor_caption]:
-        word_vecs = []
-        for word in caption.split():
-            if word.lower() in model.model_txt:
-                word_vecs.append(torch.tensor(model.model_txt[word.lower()]))
-        text_vecs.append(torch.stack(word_vecs).mean(dim=0))
-    text_vecs = torch.stack(text_vecs).to(model.device)
+    # BERT
+    #========================================================
+    encoding = model.tokenizer.batch_encode_plus(
+        anchor_caption,                    # List of input texts
+        padding=True,              # Pad to the maximum sequence length
+        truncation=True,           # Truncate to the maximum sequence length if necessary
+        return_tensors='pt',      # Return PyTorch tensors
+        add_special_tokens=True    # Add special tokens CLS and SEP
+    )
+    
+    input_ids = encoding['input_ids']  # Token IDs
+    attention_mask = encoding['attention_mask']  # Attention mask
 
-    txt_emb = txt_model(text_vecs) # (bs, 4096)
+    with torch.no_grad():
+        outputs = model.model_txt(input_ids, attention_mask=attention_mask)
+        word_embeddings = outputs.last_hidden_state  # This contains the embeddings
+    
+    # Compute the average of word embeddings to get the sentence embedding
+    sentence_embedding = word_embeddings.mean(dim=1).to(model.device)  # Average pooling along the sequence length dimension
+    
+    text_embds = model.text_model.forward(sentence_embedding)
 
-    distance, neighbors = knn.kneighbors(txt_emb.detach().cpu().numpy(), return_distance=True)
+
+    distance, neighbors = knn.kneighbors(text_embds.detach().cpu().numpy(), return_distance=True)
     neighbors, distances = order_neighbors_by_distance(fit_features_y[neighbors], distance)
 
     neighbors = neighbors[0].tolist()
@@ -309,7 +321,7 @@ def show_caption_and_related_images(anchor_caption, knn, all_images_train, fit_f
         return
 
     # Directory for saving the results
-    os.makedirs('./results_task_b_own_examples/', exist_ok=True)
+    os.makedirs('./results_task_b/', exist_ok=True)
 
     # Initialize the figure
     fig = plt.figure(figsize=(15, 10))
@@ -332,7 +344,7 @@ def show_caption_and_related_images(anchor_caption, knn, all_images_train, fit_f
         pred_img_ax.axis('off')
 
     pid = str(uuid4())
-    save_path = os.path.join(f"./results_task_b_own_examples/{pid}.png")
+    save_path = os.path.join(f"./results_task_b/{pid}.png")
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # Adjust the layout
     plt.savefig(save_path, bbox_inches='tight', pad_inches=0.5)
     plt.close(fig)
@@ -347,15 +359,20 @@ if __name__ == "__main__":
     if not USE_PICKLE_INFO:
         #LOAD SAVED MODEL
         #========================================================
-        # task_b
-        WEIGHT_SAVE_PATH = './weights/image_model_task_b_1epoch.pth'
+        WEIGHT_SAVE_PATH_TXT = './weights/text_model_task_b_1epoch.pth'
+        WEIGHT_SAVE_PATH_IMG = './weights/image_model_task_b_1epoch.pth'
+
+        model_no_train = Model()
+        txt_model_no_train = model_no_train.text_model
+        img_model_no_train = model_no_train.model_img
 
         model = Model()
 
-        txt_model = model.model_txt
+        txt_model = model.text_model
         img_model = model.model_img
 
-        model.embedding_model.load_state_dict(torch.load(WEIGHT_SAVE_PATH, map_location='cpu'))
+        txt_model.load_state_dict(torch.load(WEIGHT_SAVE_PATH_TXT, map_location='cpu'))
+        img_model.load_state_dict(torch.load(WEIGHT_SAVE_PATH_IMG, map_location='cpu'))
         #========================================================
 
         dataset_train = Dataset(True)
@@ -368,8 +385,9 @@ if __name__ == "__main__":
         model = None
         dataloader_val = None
 
-    # tsne_embeddings(img_model, txt_model, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings after the alignment")
-
+    #tsne_embeddings(img_model_no_train, txt_model_no_train, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings before the alignment", img_name="before_c_b")
+    #tsne_embeddings(img_model, txt_model, dataloader_val, use_saved_pickles=USE_PICKLE_INFO, title="Embeddings after the alignment", img_name="after_c_b")
+    
     imgs_embds_fit, captions_embds_fit, ids_fit, all_images_train = get_embeddings(img_model, txt_model, dataloader_train, max_samples=200, save_pickles=False)
     imgs_embds_retrieve, captions_embds_retrieve, ids_retrieve, all_images_val = get_embeddings(img_model, txt_model, dataloader_val, max_samples=200, save_pickles=False)
     ids_retrieve = [x.tolist() for x in ids_retrieve]

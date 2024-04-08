@@ -20,3 +20,7 @@ We had to trained a series of models with Contrastive Learning,  building first 
 
 ![summaryslide W3](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W3/summary_slide_G7_W3.png)
 
+## Week 4: Cross-Modal Retrieval
+We have used triplet networks in order to relationate image embeddings with caption embeddings from different modalities.
+
+![summaryslide W4](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W4/summary_slide_G7_W4.png)
