@@ -32,53 +32,51 @@ def get_tsne_plot(embeddings, clusters):
     out_tsne = TSNE(n_components=N_COMPONENTS, verbose=1).fit_transform(embeddings)
 
 
+if __name__ == '__main__':
+    
+    # Model for computing sentence embeddings. We use one trained for similar questions detection
+    model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# Model for computing sentence embeddings. We use one trained for similar questions detection
-model = SentenceTransformer("all-MiniLM-L6-v2")
+    train_set = OriginalDataset(train=True)
 
-max_corpus_size = 50000  # We limit our corpus to only the first 50k questions
+    dataloader_train = DataLoader(train_set, batch_size=16, drop_last=False, shuffle=False)
 
+    all_captions = []
+    for _, captions, all_ids in dataloader_train:
+        all_captions.extend(captions)
 
-train_set = OriginalDataset(train=True)
-
-dataloader_train = DataLoader(train_set, batch_size=16, drop_last=False, shuffle=False)
-
-all_captions = []
-for _, captions, all_ids in dataloader_train:
-    all_captions.extend(captions)
-
-print("Encoding the captions. This might take a while ...\n")
-corpus_embeddings = model.encode(all_captions, batch_size=25, show_progress_bar=True, convert_to_tensor=True)
+    print("Encoding the captions. This might take a while ...\n")
+    corpus_embeddings = model.encode(all_captions, batch_size=25, show_progress_bar=True, convert_to_tensor=True)
 
 
 
 
 
-print("Start clustering")
-start_time = time.time()
+    print("Start clustering")
+    start_time = time.time()
 
-# Two parameters to tune:
-# min_cluster_size: Only consider cluster that have at least 25 elements
-# threshold: Consider sentence pairs with a cosine-similarity larger than threshold as similar
-clusters = util.community_detection(corpus_embeddings, min_community_size=25, threshold=0.75)
+    # Two parameters to tune:
+    # min_cluster_size: Only consider cluster that have at least 25 elements
+    # threshold: Consider sentence pairs with a cosine-similarity larger than threshold as similar
+    clusters = util.community_detection(corpus_embeddings, min_community_size=1000, threshold=0.75)
 
-print("Clustering done after {:.2f} sec".format(time.time() - start_time))
+    print("Clustering done after {:.2f} sec".format(time.time() - start_time))
 
-print("Saving corpus embeddings and clusters pickles")
-with open('corpus_embeddings.pkl', 'wb') as fp:
-    pickle.dump(corpus_embeddings, fp)
+    print("Saving corpus embeddings and clusters pickles")
+    with open('corpus_embeddings_1000.pkl', 'wb') as fp:
+        pickle.dump(corpus_embeddings, fp)
 
-with open('clusters.pkl', 'wb') as fp:
-    pickle.dump(clusters, fp)
+    with open('clusters_1000.pkl', 'wb') as fp:
+        pickle.dump(clusters, fp)
 
 
-# Print for all clusters the top 3 and bottom 3 elements
-for i, cluster in enumerate(clusters):
-    print("\nCluster {}, #{} Elements ".format(i + 1, len(cluster)))
-    for sentence_id in cluster[0:3]:
-        print("\t", all_captions[sentence_id])
-    print("\t", "...")
-    for sentence_id in cluster[-3:]:
-        print("\t", all_captions[sentence_id])
+    # Print for all clusters the top 3 and bottom 3 elements
+    for i, cluster in enumerate(clusters):
+        print("\nCluster {}, #{} Elements ".format(i + 1, len(cluster)))
+        for sentence_id in cluster[0:3]:
+            print("\t", all_captions[sentence_id])
+        print("\t", "...")
+        for sentence_id in cluster[-3:]:
+            print("\t", all_captions[sentence_id])
 
-    print("\n\n ---------------- \n\n")
+        print("\n\n ---------------- \n\n")
