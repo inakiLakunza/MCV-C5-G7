@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import json
 from tqdm import tqdm
+import csv
 
 from dataloader_original_set import OriginalDataset
 
@@ -22,6 +23,50 @@ from bertopic import BERTopic
 
 
 
+def get_ids_and_captions(load=False,
+                         save_pkls=True,
+                         img_ids_pkl='./all_img_ids.pkl',
+                         ids_pkl='./all_ids.pkl',
+                         captions_pkl='./all_captions.pkl'
+                         ):
+    
+    if load:
+        with open(img_ids_pkl, 'rb') as fp:
+            all_img_ids = pickle.load(fp)
+        with open(ids_pkl, 'rb') as fp:
+            all_ids = pickle.load(fp)
+        with open(captions_pkl, 'rb') as fp:
+            all_captions = pickle.load(fp)
+
+
+    else:
+
+        all_img_ids, all_ids, all_captions = [], [], []
+
+        train_set = OriginalDataset(train=True)
+        dataloader_train = DataLoader(train_set, 
+                                      batch_size=16,
+                                      drop_last=False,
+                                      shuffle=False)
+        
+        for img_ids, ids, captions in dataloader_train:
+            all_img_ids.extend(img_ids)
+            all_ids.extend(ids)
+            all_captions.extend(captions)
+
+        if save_pkls:
+            with open(img_ids_pkl, 'wb') as fp:
+                pickle.dump(all_img_ids, fp)
+            with open(ids_pkl, 'wb') as fp:
+                pickle.dump(all_ids, fp)
+            with open(captions_pkl, 'wb') as fp:
+                pickle.dump(all_captions, fp)
+            
+
+    return all_img_ids, all_ids, all_captions
+
+
+
 def cluster_of_interest(top_three):
     for topic in top_three:
         s = topic.lower()
@@ -31,7 +76,22 @@ def cluster_of_interest(top_three):
 
 
 def save_cluster_of_interest(cluster):
-    pass
+
+    with open('animal_dataset.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        for position in cluster:
+
+            image_id = all_img_ids[position]
+            id       = all_ids[position]
+            caption  = all_captions[position]
+
+            save_dict = {}
+            save_dict['image_id'] = image_id
+            save_dict['id'] = id
+            save_dict['caption'] = caption
+
+            writer.writerow(save_dict)
+
 
 
 
@@ -111,6 +171,16 @@ if __name__ == '__main__':
         "A brown horse is grazing grass near a red house."
         
     ]
+
+
+    # GET ALL 3 LISTS, IF LOAD IS FALSE GENERATE THEM, ELSE LOAD THEM FROM THE PKL FILES
+    all_img_ids, all_ids, all_captions = get_ids_and_captions(load=False,
+                                                              save_pkls=True,
+                                                              img_ids_pkl='./pkl_all_img_ids.pkl',
+                                                              ids_pkl='./pkl_all_ids.pkl',
+                                                              captions_pkl='./pkl_all_captions.pkl')
+
+    sys.exit()
 
     topic_model = BERTopic()
     topic_ids, probs = topic_model.fit_transform(test_captions)

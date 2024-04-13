@@ -12,9 +12,9 @@ model_id = "stabilityai/stable-diffusion-xl-base-1.0"
 # HYPERPARAMETERS
 #===================================
 USE_DDPM = True
-GUIDANCE_SCALE = 25
+GUIDANCE_SCALE = 2
 N_STEPS = 50
-N_IMAGES = 5
+N_IMAGES = 8
 #====================================
 
 
@@ -43,7 +43,7 @@ for i in range(N_IMAGES):
     times.append(end_time - start_time)
     FOLDER_PATH = os.path.join("./", "results_sd_xl", FOLDER_NAME)
     os.makedirs(FOLDER_PATH, exist_ok=True)
-    img_save_path = os.path.join(FOLDER_PATH, f"sd_xl_{i}.png")
+    img_save_path = os.path.join(FOLDER_PATH, f"sd_xl_{i}_2nd_try.png")
     image.save(img_save_path)
 
 print(f"[SD XL] Average inference time: {sum(times) / len(times)} s")

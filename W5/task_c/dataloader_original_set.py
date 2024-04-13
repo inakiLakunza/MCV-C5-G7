@@ -50,8 +50,12 @@ class OriginalDataset():
         
         anchor_img = self.transform(Image.open(anchor_path).convert('RGB')).to(self.device)
 
+        # CHOOSE WANTED RETURN
+        #==================================
         #return anchor_img, caption, id
-        return caption, id
+        #return caption, id
+        return anchor_id, id, caption
+        #==================================
 
     def get_random_image(self):
         random_index = random.randint(0, len(self.info) - 1)

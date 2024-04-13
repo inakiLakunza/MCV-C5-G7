@@ -24,3 +24,9 @@ We had to trained a series of models with Contrastive Learning,  building first 
 We have used triplet networks in order to relationate image embeddings with caption embeddings from different modalities.
 
 ![summaryslide W4](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W4/summary_slide_G7_W4.png)
+
+
+## Week 5: Diffusion models
+We have understand and used different diffusion models for data augmenting the previous week's database and improving the obtained results.
+
+![summaryslide W4](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W5/summary_slide_G7_W5.png)
