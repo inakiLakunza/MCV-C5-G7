@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 from facenet_pytorch import InceptionResnetV1
 from torch.utils.data import ConcatDataset, DataLoader
 
+from filter_datasets import FilteredImageFolder
+
 # Note: this notebook requires torch >= 1.10.0
 print("torch version: ", torch.__version__)
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -114,15 +116,28 @@ def transform_data(IMAGE_WIDTH,IMAGE_HEIGHT):
 
 
 def transforms_for_augment(IMAGE_WIDTH, IMAGE_HEIGHT):
-    IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_WIDTH)
+    IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_HEIGHT)
 
-    augment_trainsform_1 = transforms.Compose([
+    augment_transform_1 = transforms.Compose([
         v2.Resize(size=IMAGE_SIZE),
         # METER TRANSFORMS,
+        v2.TrivialAugmentWide(),
+        v2.RandomHorizontalFlip(p=0.5),
+        v2.RandomRotation(degrees=(-12, 12)),
+        v2.ColorJitter(brightness=.1, hue=.005),
         v2.ToTensor(), # this also converts all pixel values from 0 to 255 to be between 0.0 and 1.0 
         v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
+    augment_transform_2 = transforms.Compose([
+        v2.Resize(size=IMAGE_SIZE),
+        # METER TRANSFORMS,
+        v2.TrivialAugmentWide(),
+        v2.RandomHorizontalFlip(p=1),
+        v2.ToTensor(), # this also converts all pixel values from 0 to 255 to be between 0.0 and 1.0 
+        v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+    return augment_transform_1, augment_transform_2
 
 
 
@@ -179,27 +194,24 @@ def loadImageData(train_dir,valid_dir,test_dir,data_train_transform, data_valid_
 def loadAugmentedData(train_dir, data_train_transform):
 
 
-    wanted_classes = ["1", "2", "6", "7"]
+    non_wanted_classes = ["3", "4", "5"]
 
     # TO DO:
     # CHANGE TRANSFORMS TO THE TRANSFORMATIONS WE WANT TO GENERATE
-    wanted_folder = [datasets.ImageFolder(root=os.path.join(train_dir, number), # target folder of images
+    augmented_data = datasets.ImageFolder(root=train_dir, # target folder of images
                                           transform=data_train_transform, # transforms to perform on data (images)
                                           target_transform=None) # transforms to perform on labels (if necessary)
-                                          for number in wanted_classes]
+                                          
     
-    augmented_data = ConcatDataset(wanted_folder)
+
+    filtered_dataset = FilteredImageFolder(dataset=augmented_data, filter_classes=non_wanted_classes)
 
 
-
-    # Get class names as a list
-    class_names = augmented_data.classes
-    print("Class names: ",class_names)
 
     # Check the lengths
-    print("The lengths of the augemneted training data: ", len(augmented_data))  
+    print("The lengths of the augmented training data: ", len(filtered_dataset))  
 
-    return augmented_data, class_names
+    return filtered_dataset
 
 
 
@@ -256,6 +268,11 @@ def myDataLoader(train_data, valid_data, test_data, NUM_WORKERS, BATCH_SIZE, BAT
                                 num_workers=NUM_WORKERS,
                                 shuffle=False) # don't usually need to shuffle testing data
 
+
+    print('Train Dataloader:')
+    print(len(train_dataloader))
+    print('Test Dataloader:')
+    print(len(test_dataloader))
     # Now let's get a batch image and check the shape of this batch.    
     img, label = next(iter(train_dataloader))
 
@@ -549,20 +566,28 @@ def main(data_path,model_stage,parameters_dict,class_weights):
 
     # data transformation
     data_train_transform, data_valid_test_transform = transform_data(parameters_dict['image_size']['values'][0], parameters_dict['image_size']['values'][1])
-    plot_transformed_images(image_path_list, transform=data_train_transform, n=3)
+    augmented_train_transform_1, augmented_train_transform_2 = transforms_for_augment(parameters_dict['image_size']['values'][0], parameters_dict['image_size']['values'][1])
+    plot_transformed_images(image_path_list, transform=augmented_train_transform_2, n=3)
     
     # data loader
     train_data, valid_data, test_data, class_names = loadImageData(train_dir,valid_dir,test_dir,data_train_transform, data_valid_test_transform)
-    
+
+    print('Train data:')
+    print(train_data[0])
     # LOAD THE AUGMENTED TRAIN DATASET, WITH THE AUGMENTATIONS OF THE 
     # CLASSES WITH LOWEST SAMPLES
-    train_data_augmented = loadAugmentedData(train_dir,valid_dir,test_dir,data_train_transform, data_valid_test_transform)
-    
-    train_data_full = ConcatDataset([train_data, train_data_augmented])
-    
+    train_data_augmented_1 = loadAugmentedData(train_dir,augmented_train_transform_1)
+    train_data_augmented_2 = loadAugmentedData(train_dir,augmented_train_transform_2)
+    print('Train data augmented:')
+    print(train_data_augmented_1[0])
+    train_data_full = ConcatDataset([train_data, train_data_augmented_1,train_data_augmented_2])
+
+
+    print('Concatenate dataset len:')
+    print(len(train_data_full))
     num_classes = len(class_names)
-    detail_one_sample_data(train_data, class_names)
-    train_dataloader, valid_dataloader, test_dataloader = myDataLoader(train_data, valid_data, test_data, parameters_dict['num_workers']['values'][0], parameters_dict['batch_size']['values'][0], parameters_dict['batch_size_valid']['values'][0], parameters_dict['batch_size_test']['values'][0])
+    detail_one_sample_data(train_data_full, class_names)
+    train_dataloader, valid_dataloader, test_dataloader = myDataLoader(train_data_full, valid_data, test_data, parameters_dict['num_workers']['values'][0], parameters_dict['batch_size']['values'][0], parameters_dict['batch_size_valid']['values'][0], parameters_dict['batch_size_test']['values'][0])
 
     # model definition
     model = InceptionResnetV1(classify=True, pretrained='vggface2', num_classes=num_classes).to(device)
@@ -587,7 +612,11 @@ def main(data_path,model_stage,parameters_dict,class_weights):
         summary(model, input_size=[1, 3, parameters_dict['image_size']['values'][0], parameters_dict['image_size']['values'][1]])
 
         # Setup loss function and optimizer
-        loss_fn = nn.CrossEntropyLoss(weight=class_weights)
+        print("Class_weights: ", class_weights)
+
+        # HE PUESTO AQUI QUE LO VUELVA A PASAR A TORCH Y A DEVICE
+        # ANTES NO LO HACIA, AUNQUE ESTUVIESE PUESTO EN LAS LINEAS 719-737
+        loss_fn = nn.CrossEntropyLoss(weight=torch.tensor(class_weights).to(device))
         optimizer = torch.optim.Adam(params=model.parameters(), lr=parameters_dict['learning_rate']['values'][0])
         
         # Train model_0 
@@ -686,8 +715,29 @@ if __name__ == '__main__':
     # train data distribution per category [10, 164, 1264, 2932, 1353, 232, 51]
     class_weights = torch.tensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]).to(device) # can be changed to use class weights
     
+    # LOSS MODIFICATION
+    #===============================================================================================
+    train_data_per_category_original: list[int] = [10, 164, 1264, 2932, 1353, 232, 51]
+    n_elements_original: int = sum(train_data_per_category_original)
+
+    # Number of augmetations we have introduced 
+    # for the classes with a low number of elements
+    N_AUGMENTATIONS: int = 3
+    train_data_per_category_augmented: list[int] = [10*N_AUGMENTATIONS, 164*N_AUGMENTATIONS, 1264, 2932, 1353, 232*N_AUGMENTATIONS, 51*N_AUGMENTATIONS]
+    n_elements_augmented: int = sum(train_data_per_category_augmented)
+
+    class_weigths_original = [num/n_elements_original for num in train_data_per_category_original]
+    class_weigths_augmented = [num/n_elements_augmented for num in train_data_per_category_augmented]
+
+    class_weights_original = torch.tensor(class_weigths_original).to(device)
+    class_weights_augmented = torch.tensor(class_weigths_augmented).to(device)
+    print('Inaki gg')
+    print(class_weights_original)
+    print(type(class_weights_original))
+    #===============================================================================================
+
     data_path = sys.argv[1] # path to the input data
     model_stage = sys.argv[2] # 'train', 'resume' or 'test'
 
-    main(data_path, model_stage, parameters_dict,class_weights)
+    main(data_path, model_stage, parameters_dict, class_weigths_augmented)
 
