@@ -18,24 +18,16 @@ def parse_data(LABELS_PATH):
         if label.startswith('.'): continue
         complete_path = os.path.join(LABELS_PATH, label)
         all_paths = sorted(os.listdir(complete_path))
-        for i in range(0, len(all_paths) - 1, 3):
-            dict_files = {}
-            for j in range(i, i+3):
-                if all_paths[j].split('.')[-1] == 'jpg':
-                    dict_files["image_path"] = os.path.join(LABELS_PATH, label, all_paths[j])
-                elif all_paths[j].split('.')[-1] == 'wav':
-                    dict_files["audio_path"] = os.path.join(LABELS_PATH, label, all_paths[j])
-                elif all_paths[j].split('.')[-1] == 'pkl':
-                    dict_files["text_path"] = os.path.join(LABELS_PATH, label, all_paths[j])
-            dict_files["label"] = label
-            data.append(dict_files)
+        for path in all_paths:
+            if path.split('.')[-1] == 'jpg':
+                data.append({"image_path": os.path.join(LABELS_PATH, label, path), "label": label})
     return data
 
 
     
 
 class Dataset():
-    def __init__(self, regime="train"):
+    def __init__(self, regime="train", aug=None):
 
         assert regime.lower() in ["train", "val", "test"], "Chosen regime is not correct"
 
@@ -51,28 +43,44 @@ class Dataset():
         self.data = parse_data(LABELS_PATH)
 
         if regime == 'train':
-            self.data_train_transform = transforms.Compose([
-                v2.Resize(size=224),
-                v2.TrivialAugmentWide(),
-                # Turn the image into a torch.Tensor
-                v2.ToTensor(), # this also converts all pixel values from 0 to 255 to be between 0.0 and 1.0 
-                # resnet50 normalization
-                v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-            ])
+            if aug == None:
+                self.data_train_transform = transforms.Compose([
+                    v2.Resize(size=224),
+                    v2.TrivialAugmentWide(),
+                    v2.ToTensor(),
+                    v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                ])
+            elif aug == 'train_aug_1':
+                self.data_train_transform = transforms.Compose([
+                    v2.Resize(size=224),
+                    # METER TRANSFORMS,
+                    v2.TrivialAugmentWide(),
+                    v2.RandomHorizontalFlip(p=1),
+                    v2.ToTensor(), 
+                    v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                ])
+            elif aug == 'train_aug_2':
+                self.data_train_transform = transforms.Compose([
+                    v2.Resize(size=224),
+                    # METER TRANSFORMS,
+                    v2.TrivialAugmentWide(),
+                    v2.RandomHorizontalFlip(p=0.5),
+                    v2.RandomRotation(degrees=(-12, 12)),
+                    v2.ColorJitter(brightness=.1, hue=.005),
+                    v2.ToTensor(), 
+                    v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                ])
         else:
             self.data_train_transform = transforms.Compose([
                 v2.Resize(size=224),
-                # Turn the image into a torch.Tensor
-                v2.ToTensor(), # this also converts all pixel values from 0 to 255 to be between 0.0 and 1.0 
-                # resnet50 normalization
+                v2.ToTensor(),
                 v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ])
-
     
     def __len__(self):
         return len(self.data)
     
-    def read_image(self, img_path):
+    def read_image(self, img_path, label):
         img = Image.open(img_path).convert('RGB')
         img_tensor = self.data_train_transform(img)
         return img_tensor
@@ -95,7 +103,7 @@ class Dataset():
         tempo = librosa.beat.tempo(y=data_noise_reduced, sr=8000, start_bpm=10)[0]
         f0, _, _ = librosa.pyin(y=data_noise_reduced, sr=8000,
                                 fmin=10, fmax=4000, frame_length=1024)
-        timepoints = np.linspace(0, duration, num=len(f0), endpoint=False)
+        #timepoints = np.linspace(0, duration, num=len(f0), endpoint=False)
         f0_values = [
             np.nanmean(f0),
             np.nanmedian(f0),
@@ -107,6 +115,6 @@ class Dataset():
 
     def __getitem__(self, index):
         record = self.data[index]
-        return (self.read_text(record["text_path"]), 
-                torch.tensor(int(record["label"])))
+        images = self.read_image(record["image_path"], record["label"])
+        return (images, torch.tensor(int(record["label"])))
     
