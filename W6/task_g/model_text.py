@@ -10,7 +10,7 @@ from tqdm import tqdm
 from PIL import Image
 import pickle
 from torchvision.transforms import v2
-from dataloader import Dataset
+from text_dataloader import Dataset
 import tqdm
 
 import torch

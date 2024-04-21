@@ -82,7 +82,13 @@ class Dataset():
 
         # start = time.time()
         f0, _, _ = librosa.pyin(y=data_noise_reduced, sr=sr,
-                                fmin=10, fmax=350, frame_length=4096)
+                                fmin=10, fmax=450, frame_length=4096)
+        
+        # TO AVOID NAN ERRORS
+        if np.isnan(f0).all(): 
+            return_list = [0.0]*7
+            return torch.tensor(return_list).to(torch.float)
+
         # end = time.time()
         # print("f0 pyin: " + str(end-start))
         #timepoints = np.linspace(0, duration, num=len(f0), endpoint=False)

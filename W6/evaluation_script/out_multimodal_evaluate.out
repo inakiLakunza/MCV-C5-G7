@@ -1,0 +1,58 @@
+----
+Global Average accuracy = 0.4218
+----
+Age distribution =  [5, 48, 410, 972, 458, 64, 18]
+Average accuracy of age category 1 = 0.0000
+Average accuracy of age category 2 = 0.0000
+Average accuracy of age category 3 = 0.0610
+Average accuracy of age category 4 = 0.7593
+Average accuracy of age category 5 = 0.1528
+Average accuracy of age category 6 = 0.0000
+Average accuracy of age category 7 = 0.0000
+----
+Gender distribution (Male | Female) =  [914, 1061]
+Average accuracy of Male category = 0.4212
+Average accuracy of Female category = 0.4222
+----
+Ethnicity distribution (Asian | Caucasian | African-American) =  [89, 1670, 216]
+Average accuracy of Asian category = 0.4382
+Average accuracy of Caucasian category = 0.4234
+Average accuracy of African-American category = 0.4028
+----
+--- Age bias ---
+[0.0, 0.0, 0.06097560975609756, 0.7592592592592593, 0.15283842794759825, 0.0, 0.0]
+acc[0.0000]-acc[0.0000] = 0.0000
+acc[0.0000]-acc[0.0610] = 0.0610
+acc[0.0000]-acc[0.7593] = 0.7593
+acc[0.0000]-acc[0.1528] = 0.1528
+acc[0.0000]-acc[0.0000] = 0.0000
+acc[0.0000]-acc[0.0000] = 0.0000
+acc[0.0000]-acc[0.0610] = 0.0610
+acc[0.0000]-acc[0.7593] = 0.7593
+acc[0.0000]-acc[0.1528] = 0.1528
+acc[0.0000]-acc[0.0000] = 0.0000
+acc[0.0000]-acc[0.0000] = 0.0000
+acc[0.0610]-acc[0.7593] = 0.6983
+acc[0.0610]-acc[0.1528] = 0.0919
+acc[0.0610]-acc[0.0000] = 0.0610
+acc[0.0610]-acc[0.0000] = 0.0610
+acc[0.7593]-acc[0.1528] = 0.6064
+acc[0.7593]-acc[0.0000] = 0.7593
+acc[0.7593]-acc[0.0000] = 0.7593
+acc[0.1528]-acc[0.0000] = 0.1528
+acc[0.1528]-acc[0.0000] = 0.1528
+acc[0.0000]-acc[0.0000] = 0.0000
+Age bias = 0.2519
+--- Gender bias ---
+[0.4212253829321663, 0.4222431668237512]
+acc[0.4212]-acc[0.4222] = 0.0010
+Gender bias = 0.0010
+--- Ethnicity bias ---
+[0.43820224719101125, 0.4233532934131736, 0.4027777777777778]
+acc[0.4382]-acc[0.4234] = 0.0148
+acc[0.4382]-acc[0.4028] = 0.0354
+acc[0.4234]-acc[0.4028] = 0.0206
+Ethnicity bias = 0.0236
+=======
+Average bias = 0.0922
+=======

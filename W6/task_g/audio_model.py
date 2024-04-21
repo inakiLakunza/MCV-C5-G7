@@ -80,7 +80,7 @@ class AudioModel(nn.Module):
         self.loss = nn.CrossEntropyLoss(weight=torch.tensor(class_weights).to(self.device))
 
         params = self.parameters()
-        self.optimizer = torch.optim.AdamW(params, lr=1e-6, weight_decay=0.)
+        self.optimizer = torch.optim.AdamW(params, lr=5e-3, weight_decay=0.)
         #======================================
 
 
@@ -143,7 +143,7 @@ class AudioModel(nn.Module):
 
                 # WE WANT EACH EPOCH TO BE FASTER, AND WE WILL USE MORE EPOCHS
                 if stop_batch:
-                    if batch_idx == stop_batch: break
+                    if batch_idx >= stop_batch: break
 
             average_loss = loss / batches
             average_accuracy = accuracy / batches
@@ -200,13 +200,10 @@ class AudioModel(nn.Module):
                 running_acc.append(accuracy)
 
                 if stop_batch:
-                    if batch_idx == stop_batch: break
+                    if batch_idx >= stop_batch: break
 
-            print(f'EPOCH {epoch} |  Avg Loss: {torch.Tensor(running_loss).mean()}  Avg Acc: {torch.Tensor(running_acc).mean()}')
-            
             val_loss, val_acc = self.evaluate(val_dataloader, stop_batch=120)
-            print(f'EPOCH {epoch} |  Val loss: {val_loss}  Avg Acc: {val_acc}\n\n')
-            
+            print(f'EPOCH {epoch} |   Train Loss: {torch.Tensor(running_loss).mean()}  Train Acc: {torch.Tensor(running_acc).mean()}   Val loss: {val_loss}   Avg Acc: {val_acc}')
 
             # if best val_loss until now, save it
             if val_loss < best_loss:
@@ -223,7 +220,7 @@ class AudioModel(nn.Module):
                 best_loss = val_loss
 
                 # Save
-                torch.save(model_info_best_loss, save_path_root+"_best_loss_torch_load_GOOD.pth")
+                torch.save(model_info_best_loss, save_path_root+"_best_loss_torch_load_GOOD_3.pth")
 
             
             # if best val_acc until now, save it
@@ -241,7 +238,7 @@ class AudioModel(nn.Module):
                 best_acc = val_acc
 
                 # Save
-                torch.save(model_info_best_acc, save_path_root+"_best_acc_torch_load_try_GOOD.pth")
+                torch.save(model_info_best_acc, save_path_root+"_best_acc_torch_load_try_GOOD_3.pth")
     
     
         

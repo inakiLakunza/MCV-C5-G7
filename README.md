@@ -30,3 +30,9 @@ We have used triplet networks in order to relationate image embeddings with capt
 We have understand and used different diffusion models for data augmenting the previous week's database and improving the obtained results.
 
 ![summaryslide W4](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W5/summary_slide_G7_W5.png)
+
+
+## Week 6: Multimodal human analysis
+We have used a combination of a image model, a audio model and a text model in order to create a multimodal model, and used it to classify input data (img, audio and text) in age categories.
+
+![summaryslide W4](https://github.com/inakiLakunza/MCV-C5-G7/blob/main/W6/summary_slide_G7_W6.png)
