@@ -28,6 +28,7 @@ def parse_data(LABELS_PATH):
                 elif all_paths[j].split('.')[-1] == 'pkl':
                     dict_files["text_path"] = os.path.join(LABELS_PATH, label, all_paths[j])
             dict_files["label"] = label
+            dict_files["videoName"] = all_paths[j].split('.')[:-1]
             data.append(dict_files)
     return data
 
@@ -130,5 +131,6 @@ class Dataset():
         texts  = self.read_text(record["text_path"])
         audios = self.read_audio(record["audio_path"])
         labels = torch.tensor(int(record["label"]))
-        return (images, texts, audios, labels)
+        videoNames = torch.tensor(int(record["videoName"])) 
+        return (images, texts, audios, labels, videoNames)
     
